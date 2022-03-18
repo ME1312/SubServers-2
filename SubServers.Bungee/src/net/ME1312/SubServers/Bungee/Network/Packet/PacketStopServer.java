@@ -58,7 +58,7 @@ public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOu
             UUID player =    (data.contains(0x0003)?data.getUUID(0x0003):null);
 
             Map<String, Server> servers = plugin.api.getServers();
-            if (!name.equals("*") && !servers.keySet().contains(name.toLowerCase())) {
+            if (!name.equals("*") && !servers.containsKey(name.toLowerCase())) {
                 client.sendPacket(new PacketStopServer(3, tracker));
             } else if (!name.equals("*") && !(servers.get(name.toLowerCase()) instanceof SubServer)) {
                 client.sendPacket(new PacketStopServer(4, tracker));

@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Client.Bukkit.Library;
 import net.ME1312.Galaxi.Library.Access;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Try;
@@ -16,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -589,9 +591,9 @@ public final class Placeholders {
     }
 
     public final class Cache {
-        private HashMap<String, Proxy> proxies = new HashMap<String, Proxy>();
-        private HashMap<String, Host> hosts = new HashMap<String, Host>();
-        private HashMap<String, Server> servers = new HashMap<String, Server>();
+        private Map<String, Proxy> proxies = Collections.emptyMap();
+        private Map<String, Host> hosts = Collections.emptyMap();
+        private Map<String, Server> servers = Collections.emptyMap();
         private Proxy master = null;
         private Listener events = new Events();
 
@@ -604,10 +606,29 @@ public final class Placeholders {
 
         private void refresh(Runnable callback) {
             if (SubAPI.getInstance().getSubDataNetwork()[0] != null) {
-                AsyncConsolidator async = new AsyncConsolidator(callback);
+                Container<Boolean> order = new Container<>(null);
+                AsyncConsolidator async = new AsyncConsolidator(() -> {
+                    try {
+                        Map<String, SubServer> servers;
+                        for (Host host : hosts.values()) {
+                            servers = Util.reflect(Host.class.getDeclaredField("servers"), host);
+                            if (order.value) {
+                                this.servers.putAll(servers);
+                            } else {
+                                servers.replaceAll((name, existing) -> {
+                                    Server server = this.servers.getOrDefault(name, null);
+                                    return (server instanceof SubServer)? (SubServer) server : existing;
+                                });
+                            }
+                        }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                    callback.run();
+                });
                 async.reserve(4);
                 SubAPI.getInstance().getProxies(proxies -> {
-                    this.proxies = new HashMap<>(proxies);
+                    this.proxies = proxies;
                     async.release();
                 });
                 SubAPI.getInstance().getMasterProxy(master -> {
@@ -615,11 +636,13 @@ public final class Placeholders {
                     async.release();
                 });
                 SubAPI.getInstance().getHosts(hosts -> {
-                    this.hosts = new HashMap<>(hosts);
+                    order.value = true;
+                    this.hosts = hosts;
                     async.release();
                 });
                 SubAPI.getInstance().getServers(servers -> {
-                    this.servers = new HashMap<>(servers);
+                    order.value = false;
+                    this.servers = servers;
                     async.release();
                 });
             }
@@ -628,66 +651,65 @@ public final class Placeholders {
         private final class Events implements Listener {
             private HashMap<String, BukkitTask> edits = new HashMap<String, BukkitTask>();
 
-            @EventHandler
+            @EventHandler(priority = EventPriority.LOWEST)
             public void add(SubAddProxyEvent e) {
                 SubAPI.getInstance().getProxy(e.getProxy(), proxy -> {
                     if (proxy != null) proxies.put(proxy.getName().toLowerCase(), proxy);
                 });
             }
 
-            @EventHandler
+            @EventHandler(priority = EventPriority.LOWEST)
             public void add(SubAddHostEvent e) {
                 SubAPI.getInstance().getHost(e.getHost(), host -> {
                     if (host != null) hosts.put(host.getName().toLowerCase(), host);
                 });
             }
 
-            @EventHandler
+            @EventHandler(priority = EventPriority.LOWEST)
             public void add(SubAddServerEvent e) {
                 add(e.getServer());
             }
-
             public void add(String s) {
                 SubAPI.getInstance().getServer(s, server -> {
                     if (server != null) servers.put(server.getName().toLowerCase(), server);
                 });
             }
 
-            @EventHandler
+            @EventHandler(priority = EventPriority.LOWEST)
             public void edit(SubEditServerEvent e) {
                 String s = e.getServer().toLowerCase();
-                if (edits.keySet().contains(s)) edits.get(s).cancel();
-                edits.put(s, Bukkit.getScheduler().runTaskLater(plugin, () -> add(s), 120L));
+                if (edits.containsKey(s)) edits.get(s).cancel();
+                edits.put(s, Bukkit.getScheduler().runTaskLater(plugin, servers.containsKey(s)? servers.get(s)::refresh : () -> add(s), 120L));
             }
 
-            @EventHandler
+            @EventHandler(priority = EventPriority.LOWEST)
             public void start(SubStartEvent e) {
                 Server server = getServer(e.getServer());
                 if (server != null) {
                     Try.all.run(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("running", true));
-                    add(e.getServer());
-                }
+                    server.refresh();
+                } else add(e.getServer());
             }
 
-            @EventHandler
+            @EventHandler(priority = EventPriority.LOWEST)
             public void started(SubStartedEvent e) {
                 Server server = getServer(e.getServer());
                 if (server != null) {
                     Try.all.run(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("online", true));
-                    add(e.getServer());
-                }
+                    server.refresh();
+                } else add(e.getServer());
             }
 
-            @EventHandler
+            @EventHandler(priority = EventPriority.LOWEST)
             public void stopping(SubStopEvent e) {
                 Server server = getServer(e.getServer());
                 if (server != null) {
                     Try.all.run(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("stopping", true));
-                    add(e.getServer());
-                }
+                    server.refresh();
+                } else add(e.getServer());
             }
 
-            @EventHandler
+            @EventHandler(priority = EventPriority.LOWEST)
             public void stopped(SubStoppedEvent e) {
                 Server server = getServer(e.getServer());
                 if (server != null) Try.all.run(() -> {
@@ -695,8 +717,8 @@ public final class Placeholders {
                     raw.set("online", false);
                     raw.set("running", false);
                     raw.set("stopping", false);
-                    add(e.getServer());
-                });
+                    server.refresh();
+                }); else add(e.getServer());
             }
         }
 
@@ -715,13 +737,13 @@ public final class Placeholders {
             return master;
         }
 
-        private Map<String, Host> getHosts() {
+        public Map<String, Host> getHosts() {
             return hosts;
         }
 
-        private Host getHost(String name) {
+        public Host getHost(String name) {
             Util.nullpo(name);
-            return getHosts().get(name.toLowerCase());
+            return getHosts().getOrDefault(name.toLowerCase(), null);
         }
 
         public Map<String, List<Server>> getGroups() {
@@ -730,12 +752,12 @@ public final class Placeholders {
             for (Server server : getServers().values()) {
                 for (String name : server.getGroups()) {
                     String group = name;
-                    if (conflitresolver.keySet().contains(name.toLowerCase())) {
+                    if (conflitresolver.containsKey(name.toLowerCase())) {
                         group = conflitresolver.get(name.toLowerCase());
                     } else {
                         conflitresolver.put(name.toLowerCase(), name);
                     }
-                    List<Server> list = (groups.keySet().contains(group))?groups.get(group):new ArrayList<Server>();
+                    List<Server> list = (groups.containsKey(group))?groups.get(group):new ArrayList<Server>();
                     list.add(server);
                     groups.put(group, list);
                 }
@@ -766,7 +788,7 @@ public final class Placeholders {
 
         public Server getServer(String name) {
             Util.nullpo(name);
-            return getServers().get(name.toLowerCase());
+            return getServers().getOrDefault(name.toLowerCase(), null);
         }
 
         public Map<String, SubServer> getSubServers() {
@@ -779,7 +801,7 @@ public final class Placeholders {
 
         public SubServer getSubServer(String name) {
             Util.nullpo(name);
-            return getSubServers().get(name.toLowerCase());
+            return getSubServers().getOrDefault(name.toLowerCase(), null);
         }
     }
 }

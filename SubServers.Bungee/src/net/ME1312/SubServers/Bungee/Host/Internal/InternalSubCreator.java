@@ -276,7 +276,7 @@ public class InternalSubCreator extends SubCreator {
                     Logger.get(prefix).info("Saving...");
                     SubServer subserver = update;
                     if (update == null || update.getTemplate() != template || template.getBuildOptions().getBoolean("Update-Settings", false)) {
-                        if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
+                        if (host.plugin.exServers.containsKey(name.toLowerCase()))
                             host.plugin.exServers.remove(name.toLowerCase());
 
                         config = new ObjectMap<String>((Map<String, ?>) replacements.replace(config.get()));
@@ -389,7 +389,7 @@ public class InternalSubCreator extends SubCreator {
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Consumer<SubServer> callback) {
         Util.nullpo(name, template);
-        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name) && (version != null || !template.requiresVersion())) {
+        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().containsKey(name.toLowerCase()) && !SubCreator.isReserved(name) && (version != null || !template.requiresVersion())) {
             StackTraceElement[] origin = new Throwable().getStackTrace();
 
             if (port == null) {
@@ -470,7 +470,7 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void terminate(String name) {
-        if (this.thread.keySet().contains(name.toLowerCase())) {
+        if (this.thread.containsKey(name.toLowerCase())) {
             if (this.thread.get(name.toLowerCase()).process != null && this.thread.get(name.toLowerCase()).process.isAlive()) {
                 Executable.terminate(this.thread.get(name.toLowerCase()).process);
             } else if (this.thread.get(name.toLowerCase()).isAlive()) {
@@ -491,7 +491,7 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.keySet().contains(name.toLowerCase()) && this.thread.get(name.toLowerCase()).isAlive()) {
+        while (this.thread.containsKey(name.toLowerCase()) && this.thread.get(name.toLowerCase()).isAlive()) {
             Thread.sleep(250);
         }
     }

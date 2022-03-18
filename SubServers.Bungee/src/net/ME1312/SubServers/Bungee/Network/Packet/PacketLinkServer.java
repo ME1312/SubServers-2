@@ -90,7 +90,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
 
             Server server;
             Map<String, Server> servers = plugin.api.getServers();
-            if (name != null && servers.keySet().contains(name.toLowerCase())) {
+            if (name != null && servers.containsKey(name.toLowerCase())) {
                 link(client, servers.get(name.toLowerCase()), channel);
             } else if (address != null) {
                 if ((server = search(address)) != null || (server = create(name, address)) != null) {
@@ -139,7 +139,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
     static long last = Calendar.getInstance().getTime().getTime();
     private void link(SubDataClient client, Server server, int channel) throws Throwable {
         HashMap<Integer, SubDataClient> subdata = Try.all.get(() -> Util.reflect(ServerImpl.class.getDeclaredField("subdata"), server));
-        if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
+        if (!subdata.containsKey(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
             Logger.get("SubData").info(client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" [+"+channel+"]":""));
             Runnable register = () -> {

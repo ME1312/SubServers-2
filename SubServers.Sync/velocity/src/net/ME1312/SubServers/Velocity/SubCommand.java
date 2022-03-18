@@ -50,9 +50,9 @@ import java.util.function.Supplier;
 @SuppressWarnings("deprecation")
 public final class SubCommand implements SimpleCommand {
     static HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>> permitted = new HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>>();
-    private TreeMap<String, Proxy> proxyCache = new TreeMap<String, Proxy>();
-    private TreeMap<String, Host> hostCache = new TreeMap<String, Host>();
-    private TreeMap<String, List<Server>> groupCache = new TreeMap<String, List<Server>>();
+    private Map<String, Proxy> proxyCache = Collections.emptyMap();
+    private Map<String, Host> hostCache = Collections.emptyMap();
+    private Map<String, List<Server>> groupCache = Collections.emptyMap();
     private Proxy proxyMasterCache = null;
     private long cacheDate = 0;
     private ExProxy plugin;
@@ -433,7 +433,7 @@ public final class SubCommand implements SimpleCommand {
                                                 if (listening.size() > 0) {
                                                     PacketInExRunEvent.callback("SubStoppedEvent", this);
                                                     String name = json.getString("server").toLowerCase();
-                                                    if (listening.keySet().contains(name)) {
+                                                    if (listening.containsKey(name)) {
                                                         Timer timer = new Timer("SubServers.Sync::Server_Restart_Command_Handler(" + name + ")");
                                                         timer.schedule(new TimerTask() {
                                                             @Override
@@ -1159,7 +1159,7 @@ public final class SubCommand implements SimpleCommand {
                 } else if (args.length == 4) {
                     List<String> list = new ArrayList<String>();
                     Map<String, Host> hosts = hostCache;
-                    if (!hosts.keySet().contains(args[2].toLowerCase())) {
+                    if (!hosts.containsKey(args[2].toLowerCase())) {
                         list.add("<Template>");
                     } else {
                         for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) {
@@ -1382,7 +1382,7 @@ public final class SubCommand implements SimpleCommand {
         if (Calendar.getInstance().getTime().getTime() - cacheDate >= TimeUnit.MINUTES.toMillis(1)) {
             cacheDate = Calendar.getInstance().getTime().getTime();
             plugin.api.getProxies(proxies -> {
-                proxyCache = new TreeMap<>(proxies);
+                proxyCache = proxies;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             plugin.api.getMasterProxy(master -> {
@@ -1390,11 +1390,11 @@ public final class SubCommand implements SimpleCommand {
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             plugin.api.getHosts(hosts -> {
-                hostCache = new TreeMap<>(hosts);
+                hostCache = hosts;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             plugin.api.getGroups(groups -> {
-                groupCache = new TreeMap<>(groups);
+                groupCache = groups;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
         }

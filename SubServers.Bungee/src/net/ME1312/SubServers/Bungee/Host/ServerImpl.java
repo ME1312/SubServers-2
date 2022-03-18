@@ -105,7 +105,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         boolean update = false;
         if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
         if (client != null || channel == 0) {
-            if (!subdata.keySet().contains(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
+            if (!subdata.containsKey(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
                 update = true;
                 subdata.put(channel, (SubDataClient) client);
                 if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);

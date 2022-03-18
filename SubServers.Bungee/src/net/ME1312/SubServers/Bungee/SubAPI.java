@@ -95,7 +95,7 @@ public final class SubAPI implements BungeeAPI {
      */
     public void addHostDriver(Class<? extends Host> driver, String handle) {
         Util.nullpo(driver, handle);
-        if (plugin.hostDrivers.keySet().contains(handle.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new IllegalStateException("Driver already exists: " + handle);
+        if (plugin.hostDrivers.containsKey(handle.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new IllegalStateException("Driver already exists: " + handle);
         plugin.hostDrivers.put(handle.toUpperCase().replace('-', '_').replace(' ', '_'), driver);
     }
 
@@ -317,12 +317,12 @@ public final class SubAPI implements BungeeAPI {
         for (Server server : getServers().values()) {
             for (String name : server.getGroups()) {
                 String group = name;
-                if (conflitresolver.keySet().contains(name.toLowerCase())) {
+                if (conflitresolver.containsKey(name.toLowerCase())) {
                     group = conflitresolver.get(name.toLowerCase());
                 } else {
                     conflitresolver.put(name.toLowerCase(), name);
                 }
-                List<Server> list = (groups.keySet().contains(group))?groups.get(group):new LinkedList<Server>();
+                List<Server> list = (groups.containsKey(group))?groups.get(group):new LinkedList<Server>();
                 list.add(server);
                 groups.put(group, list);
             }
@@ -435,7 +435,7 @@ public final class SubAPI implements BungeeAPI {
      * @return Success status
      */
     public boolean addServer(UUID player, Server server) {
-        if (getServers().keySet().contains(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
+        if (getServers().containsKey(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         SubAddServerEvent event = new SubAddServerEvent(player, null, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -586,7 +586,7 @@ public final class SubAPI implements BungeeAPI {
                 players.put(id, plugin.rPlayers.get(id));
             return players;
         } else {
-            return new HashMap<>();
+            return Collections.emptyMap();
         }
     }
 

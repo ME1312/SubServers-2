@@ -153,7 +153,7 @@ public class SmartFallback implements ReconnectHandler {
                 }
 
                 if (valid) {
-                    List<ServerInfo> servers = (score.keySet().contains(confidence))?score.get(confidence):new LinkedList<ServerInfo>();
+                    List<ServerInfo> servers = (score.containsKey(confidence))?score.get(confidence):new LinkedList<ServerInfo>();
                     servers.add(server);
                     score.put(confidence, servers);
                 }

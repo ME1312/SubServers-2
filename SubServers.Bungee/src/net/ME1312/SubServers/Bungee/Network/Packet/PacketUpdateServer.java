@@ -60,7 +60,7 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
             boolean waitfor = (data.contains(0x0005)?data.getBoolean(0x0005):false);
 
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(name.toLowerCase())) {
+            if (!servers.containsKey(name.toLowerCase())) {
                 client.sendPacket(new PacketUpdateServer(3, tracker));
             } else if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
                 client.sendPacket(new PacketUpdateServer(4, tracker));

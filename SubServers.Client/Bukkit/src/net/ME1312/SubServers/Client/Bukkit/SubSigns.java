@@ -1,11 +1,14 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.SubData.Client.Library.EscapedOutputStream;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubStartEvent;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubStartedEvent;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubStopEvent;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.OfflineBlock;
+import net.ME1312.SubServers.Client.Common.Network.API.Host;
+import net.ME1312.SubServers.Client.Common.Network.API.Server;
 import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
 
 import org.bukkit.Bukkit;
@@ -26,10 +29,9 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.text.NumberFormat;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 /**
  * SubServers Signs Class
@@ -85,16 +87,16 @@ public class SubSigns implements Listener {
                             break;
                         case '\u0003': // [ETX] (End of String character)
                             magic.position(0);
-                            String server = string.toString(StandardCharsets.UTF_8.name());
+                            String object = string.toString(StandardCharsets.UTF_8.name());
                             OfflineBlock location = new OfflineBlock(new UUID(magic.getLong(), magic.getLong()), magic.getInt(), magic.getInt(), magic.getInt());
                             Location loaded = location.load();
                             if (loaded == null) {
-                                data.put(location, server);
+                                data.put(location, object);
                             } else if (loaded.getBlock().getState() instanceof Sign) {
-                                data.put(location, server);
-                                signs.put(loaded, server);
+                                data.put(location, object);
+                                signs.put(loaded, object);
                             } else {
-                                Bukkit.getLogger().warning("SubServers > Removed invalid sign data: [\"" + loaded.getWorld().getName() + "\", " + location.x + ", " + location.y + ", " + location.z + "] -> \"" + server + '\"');
+                                Bukkit.getLogger().warning("SubServers > Removed invalid sign data: [\"" + loaded.getWorld().getName() + "\", " + location.x + ", " + location.y + ", " + location.z + "] -> \"" + object + '\"');
                             }
                             magic.clear();
                             string.reset();
@@ -143,21 +145,31 @@ public class SubSigns implements Listener {
     public void create(SignChangeEvent e) {
         if (!e.isCancelled() && plugin.lang != null && e.getLine(0).trim().equalsIgnoreCase("[SubServers]")) {
             Player player = e.getPlayer();
-            String server = e.getLine(1).trim();
-            if (server.length() > 0 && player.hasPermission("subservers.signs")) {
+            String object = e.getLine(1).trim();
+            if (object.length() > 0 && player.hasPermission("subservers.signs")) {
                 Location pos = e.getBlock().getLocation();
                 if (pos.getBlock().getState() instanceof Sign) {
                     HashMap<Location, String> signs = new HashMap<Location, String>(SubSigns.signs);
-                    signs.put(pos, server);
+                    signs.put(pos, object);
                     SubSigns.signs = signs;
-                    data.put(new OfflineBlock(pos), server);
+                    data.put(new OfflineBlock(pos), object);
 
                     listen();
-                    refresh(e.getBlock(), server, null);
-                    Bukkit.getLogger().info("SubServers > Server sign created: [\"" + pos.getWorld().getName() + "\", " + pos.getBlockX() + ", " + pos.getBlockY() + ", " + pos.getBlockZ() + "] -> \"" + server + '\"');
+                    refresh(e.getBlock(), object);
+                    Bukkit.getLogger().info("SubServers > Server sign created: [\"" + pos.getWorld().getName() + "\", " + pos.getBlockX() + ", " + pos.getBlockY() + ", " + pos.getBlockZ() + "] -> \"" + object + '\"');
                     player.sendMessage(plugin.api.getLang("SubServers", "Signs.Create"));
                 }
             }
+        }
+    }
+
+    private Object translate(String name) {
+        if (name.startsWith("::")) {
+            return plugin.phi.cache.getHost(name.substring(2));
+        } else if (name.startsWith(":")) {
+            return plugin.phi.cache.getGroup(name.substring(1));
+        } else {
+            return plugin.phi.cache.getServer(name);
         }
     }
 
@@ -172,37 +184,113 @@ public class SubSigns implements Listener {
     private void refresh() {
         if (plugin.lang != null) {
             for (Entry<Location, String> pos : signs.entrySet()) {
-                refresh(pos.getKey().getBlock(), pos.getValue(), null);
+                refresh(pos.getKey().getBlock(), pos.getValue());
             }
         }
     }
 
-    private void refresh(String name, String lang) {
+    private void refresh(SubServer server) {
         if (plugin.lang != null) {
+            String name;
             for (Entry<Location, String> pos : signs.entrySet()) {
-                if (pos.getValue().equalsIgnoreCase(name)) refresh(pos.getKey().getBlock(), pos.getValue(), lang);
-            }
-        }
-    }
-
-    private void refresh(Block block, String name, String lang) {
-        if (block.getState() instanceof Sign) {
-            Sign sign = (Sign) block.getState();
-            SubServer server = plugin.phi.cache.getSubServer(name);
-            if (lang == null) {
-                if (server == null) {
-                    lang = "Signs.Text.Error";
-                } else if (server.isStopping()) {
-                    lang = "Signs.Text.Stopping";
-                } else if (server.isOnline()) {
-                    lang = "Signs.Text.Online";
-                } else if (server.isRunning()) {
-                    lang = "Signs.Text.Starting";
+                if ((name = pos.getValue()).equalsIgnoreCase(server.getName())) {
+                    refresh(pos.getKey().getBlock(), server);
+                } else if (name.equalsIgnoreCase("::" + server.getHost())) {
+                    refresh(pos.getKey().getBlock(), plugin.phi.cache.getHost(server.getHost()));
                 } else {
-                    lang = "Signs.Text.Offline";
+                    for (String group : server.getGroups()) {
+                        if (name.equalsIgnoreCase(':' + group)) {
+                            refresh(pos.getKey().getBlock(), plugin.phi.cache.getGroup(group));
+                            break;
+                        }
+                    }
                 }
             }
-            String[] text = plugin.phi.replace(null, plugin.api.getLang("SubServers", lang).replace("$str$", name)).split("\n", 4);
+        }
+    }
+
+    private enum Text {
+        UNKNOWN(0, "Signs.Text.Unknown"),
+        OFFLINE(1, "Signs.Text.Offline"),
+        STARTING(3, "Signs.Text.Starting"),
+        ONLINE(4, "Signs.Text.Online"),
+        STOPPING(2, "Signs.Text.Stopping"),
+        ;
+        private final byte priority;
+        private final String text;
+        Text(int priority, String text) {
+            this.priority = (byte) priority;
+            this.text = text;
+        }
+
+        private static Text determine(SubServer server) {
+            if (!server.isRunning()) {
+                return Text.OFFLINE;
+            } else if (server.isStopping()) {
+                return Text.STOPPING;
+            } else if (server.isOnline()) {
+                return Text.ONLINE;
+            } else {
+                return Text.STARTING;
+            }
+        }
+
+        private static Text determine(Server server) {
+            if (server instanceof SubServer) {
+                return determine((SubServer) server);
+            } else if (server.getSubData()[0] == null) {
+                return Text.UNKNOWN;
+            } else {
+                return Text.ONLINE;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void refresh(Block block, Object object) {
+        if (block.getState() instanceof Sign) {
+            Sign sign = (Sign) block.getState();
+            Text state = Text.UNKNOWN;
+            String name = "null";
+            int players = 0;
+
+            // re-define the object
+            if (object instanceof String) {
+                object = translate(name = (String) object);
+            }
+
+            // read the object
+            if (object instanceof Host) {
+                Host host = (Host) object;
+                name = host.getDisplayName();
+
+                Text incoming;
+                for (SubServer server : ((Host) object).getSubServers().values()) {
+                    players += server.getRemotePlayers().size();
+                    incoming = Text.determine(server);
+                    if (incoming.priority > state.priority)
+                        state = incoming;
+                }
+            } else if (object instanceof Pair) {
+                Pair<String, List<Server>> group = (Pair<String, List<Server>>) object;
+                name = group.key();
+
+                Text incoming;
+                for (Server server : group.value()) {
+                    players += server.getRemotePlayers().size();
+                    incoming = Text.determine(server);
+                    if (incoming.priority > state.priority)
+                        state = incoming;
+                }
+            } else if (object instanceof Server) {
+                Server server = (Server) object;
+                state = Text.determine(server);
+                name = server.getDisplayName();
+                players = server.getRemotePlayers().size();
+            }
+
+            // update the sign
+            String[] text = plugin.phi.replace(null, plugin.api.getLang("SubServers", state.text).replace("$str$", name).replace("$int$", NumberFormat.getInstance().format(players))).split("\n", 4);
             for (int i = 0; i < 4; ++i) if (i < text.length) {
                 sign.setLine(i, text[i]);
             } else {
@@ -212,16 +300,48 @@ public class SubSigns implements Listener {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @EventHandler(priority = EventPriority.MONITOR)
     public void interact(PlayerInteractEvent e) {
         if (!e.isCancelled() && e.getClickedBlock() != null && plugin.lang != null && plugin.api.getSubDataNetwork()[0] != null && !plugin.api.getSubDataNetwork()[0].isClosed() && signs.containsKey(e.getClickedBlock().getLocation())) {
             Player player = e.getPlayer();
             if ((e.getAction() == Action.RIGHT_CLICK_BLOCK || !player.hasPermission("subservers.signs")) && player.hasPermission("subservers.teleport")) {
-                SubServer server = plugin.phi.cache.getSubServer(signs.get(e.getClickedBlock().getLocation()));
-                if (server != null) {
-                    if (!server.isRunning()) {
-                        if (server.isEnabled() && server.isAvailable() && server.getCurrentIncompatibilities().size() == 0) server.start();
-                    } else if (!server.isStopping()) {
+                Object object = translate(signs.get(e.getClickedBlock().getLocation()));
+
+                Collection<? extends Server> servers;
+                if (object instanceof Host) {
+                    servers = ((Host) object).getSubServers().values();
+                } else if (object instanceof Pair) {
+                    servers = ((Pair<String, List<Server>>) object).value();
+                } else if (object instanceof Server) {
+                    servers = Collections.singleton((Server) object);
+                } else {
+                    return;
+                }
+
+                Text incoming, state = Text.UNKNOWN;
+                List<Server> selected = new ArrayList<>();
+                for (Server server : servers) {
+                    incoming = Text.determine(server);
+                    if (incoming.priority > state.priority) {
+                        selected.clear();
+                        state = incoming;
+                    }
+
+                    if (incoming == state) {
+                        if (state == Text.OFFLINE) {
+                            SubServer subserver = (SubServer) server;
+                            if (!(subserver.isEnabled() && subserver.isAvailable() && subserver.getCurrentIncompatibilities().size() == 0)) continue;
+                        }
+                        selected.add(server);
+                    }
+                }
+
+                if (selected.size() > 0) {
+                    Server server = selected.get(new Random().nextInt(selected.size()));
+                    if (state == Text.OFFLINE) {
+                        ((SubServer) server).start();
+                    } else {
                         player.sendMessage(plugin.api.getLang("SubServers", "Command.Teleport").replace("$name$", player.getName()).replace("$str$", server.getDisplayName()));
                         plugin.pmc(player, "Connect", server.getName());
                     }
@@ -249,23 +369,23 @@ public class SubSigns implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void start(SubStartEvent e) {
-        refresh(e.getServer(), "Signs.Text.Starting");
+        refresh(plugin.phi.cache.getSubServer(e.getServer()));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void started(SubStartedEvent e) {
-        refresh(e.getServer(), "Signs.Text.Online");
+        refresh(plugin.phi.cache.getSubServer(e.getServer()));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void stopping(SubStopEvent e) {
-        refresh(e.getServer(), "Signs.Text.Stopping");
+        refresh(plugin.phi.cache.getSubServer(e.getServer()));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void stopped(SubStoppedEvent e) {
-        refresh(e.getServer(), "Signs.Text.Offline");
+        refresh(plugin.phi.cache.getSubServer(e.getServer()));
     }
 }

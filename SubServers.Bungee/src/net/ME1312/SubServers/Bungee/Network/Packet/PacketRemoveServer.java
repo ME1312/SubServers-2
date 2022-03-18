@@ -59,7 +59,7 @@ public class PacketRemoveServer implements PacketObjectIn<Integer>, PacketObject
             UUID player =    (data.contains(0x0003)?data.getUUID(0x0003):null);
 
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(name.toLowerCase())) {
+            if (!servers.containsKey(name.toLowerCase())) {
                 client.sendPacket(new PacketRemoveServer(3, tracker));
             } else if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
                 if (force) {

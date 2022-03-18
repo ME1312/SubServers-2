@@ -62,7 +62,7 @@ public class PacketAddServer implements PacketObjectIn<Integer>, PacketObjectOut
             ObjectMap<String> opt = new ObjectMap<>((Map<String, ?>)data.getObject(0x0003));
             UUID player =                      (data.contains(0x0004)?data.getUUID(0x0004):null);
 
-            if (plugin.api.getServers().keySet().contains(name.toLowerCase())) {
+            if (plugin.api.getServers().containsKey(name.toLowerCase())) {
                 client.sendPacket(new PacketAddServer(3, tracker));
             } else {
                 if (!subserver) {
@@ -72,7 +72,7 @@ public class PacketAddServer implements PacketObjectIn<Integer>, PacketObjectOut
                     } else {
                         client.sendPacket(new PacketAddServer(1, tracker));
                     }
-                } else if (!plugin.api.getHosts().keySet().contains(opt.getString("host").toLowerCase())) {
+                } else if (!plugin.api.getHosts().containsKey(opt.getString("host").toLowerCase())) {
                     client.sendPacket(new PacketAddServer(4, tracker));
                 } else {
                     if (plugin.api.getHost(opt.getString("host")).addSubServer(player, name, opt.getBoolean("enabled"), opt.getInt("port"), ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(opt.getString("motd"))),

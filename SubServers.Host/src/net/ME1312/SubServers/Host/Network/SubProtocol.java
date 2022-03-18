@@ -144,7 +144,7 @@ public class SubProtocol extends SubDataProtocol {
         HashMap<Integer, SubDataClient> map = Try.all.get(() -> Util.reflect(ExHost.class.getDeclaredField("subdata"), host));
 
         int channel = 1;
-        while (map.keySet().contains(channel)) channel++;
+        while (map.containsKey(channel)) channel++;
         final int fc = channel;
 
         SubDataClient subdata = super.open(scheduler, getLogger(fc), address, port, login);

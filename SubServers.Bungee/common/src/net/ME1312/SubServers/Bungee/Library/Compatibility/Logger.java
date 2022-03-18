@@ -19,7 +19,7 @@ public class Logger {
      * @return Logger
      */
     public static java.util.logging.Logger get(String prefix) {
-        if (!existing.keySet().contains(prefix)) {
+        if (!existing.containsKey(prefix)) {
             java.util.logging.Logger log = java.util.logging.Logger.getAnonymousLogger();
                 log.setUseParentHandlers(false);
                 log.addHandler(new Handler() {

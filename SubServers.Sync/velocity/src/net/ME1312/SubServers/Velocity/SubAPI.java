@@ -83,7 +83,7 @@ public final class SubAPI extends ClientAPI {
                 players.put(id, plugin.rPlayers.get(id));
             return players;
         } else {
-            return new HashMap<>();
+            return Collections.emptyMap();
         }
     }
 

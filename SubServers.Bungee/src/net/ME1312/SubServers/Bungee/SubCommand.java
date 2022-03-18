@@ -438,7 +438,7 @@ public final class SubCommand extends Command implements TabExecutor {
                         if (select.subservers.length > 0) {
                             Consumer<SubServer> starter = server -> {
                                 Map<String, Server> servers = plugin.api.getServers();
-                                if (!servers.keySet().contains(server.getName().toLowerCase()) || !(servers.get(server.getName().toLowerCase()) instanceof SubServer)) {
+                                if (!servers.containsKey(server.getName().toLowerCase()) || !(servers.get(server.getName().toLowerCase()) instanceof SubServer)) {
                                     sender.sendMessage("SubServers > Could not restart server: Subserver " + server.getName() + " has disappeared");
                                 } else if (!(server = (SubServer) servers.get(server.getName().toLowerCase())).isRunning()) {
                                     if (!server.getHost().isAvailable()) {
@@ -565,7 +565,7 @@ public final class SubCommand extends Command implements TabExecutor {
                     if (plugin.canSudo) {
                         if (args.length > 1) {
                             Map<String, Server> servers = plugin.api.getServers();
-                            if (!servers.keySet().contains(args[1].toLowerCase()) || !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                            if (!servers.containsKey(args[1].toLowerCase()) || !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
                                 sender.sendMessage("SubServers > There is no subserver with that name");
                             } else if (!((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                                 sender.sendMessage("SubServers > That subserver is not running");
@@ -581,15 +581,15 @@ public final class SubCommand extends Command implements TabExecutor {
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
                     if (args.length > 3) {
-                        if (plugin.api.getSubServers().keySet().contains(args[1].toLowerCase()) || SubCreator.isReserved(args[1])) {
+                        if (plugin.api.getSubServers().containsKey(args[1].toLowerCase()) || SubCreator.isReserved(args[1])) {
                             sender.sendMessage("SubServers > There is already a subserver with that name");
-                        } else if (!plugin.hosts.keySet().contains(args[2].toLowerCase())) {
+                        } else if (!plugin.hosts.containsKey(args[2].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no host with that name");
                         } else if (!plugin.hosts.get(args[2].toLowerCase()).isAvailable()) {
                             sender.sendMessage("SubServers > That host is not available");
                         } else if (!plugin.hosts.get(args[2].toLowerCase()).isEnabled()) {
                             sender.sendMessage("SubServers > That host is not enabled");
-                        } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplates().keySet().contains(args[3].toLowerCase())) {
+                        } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplates().containsKey(args[3].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no template with that name");
                         } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3].toLowerCase()).isEnabled()) {
                             sender.sendMessage("SubServers > That template is not enabled");
@@ -857,19 +857,19 @@ public final class SubCommand extends Command implements TabExecutor {
         String Last = (args.length > 0)?args[args.length - 1]:"";
         String last = Last.toLowerCase();
 
-        if (sender instanceof ProxiedPlayer && (!players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+        if (sender instanceof ProxiedPlayer && (!players.containsKey(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).containsKey(((ProxiedPlayer) sender).getServer().getInfo())
         || !players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).value())) {
-            if (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) && players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+            if (players.containsKey(((ProxiedPlayer) sender).getUniqueId()) && players.get(((ProxiedPlayer) sender).getUniqueId()).containsKey(((ProxiedPlayer) sender).getServer().getInfo())
                     && players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).key() == null) {
                 // do nothing
-            } else if (!players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+            } else if (!players.containsKey(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).containsKey(((ProxiedPlayer) sender).getServer().getInfo())
             || Calendar.getInstance().getTime().getTime() - players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).key() >= TimeUnit.MINUTES.toMillis(1)) {
                 if (!(((ProxiedPlayer) sender).getServer().getInfo() instanceof Server) || ((Server) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0] == null) {
-                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
+                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (players.containsKey(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new ContainedPair<>(Calendar.getInstance().getTime().getTime(), false));
                     players.put(((ProxiedPlayer) sender).getUniqueId(), map);
                 } else {
-                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
+                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (players.containsKey(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new ContainedPair<>(null, false));
                     players.put(((ProxiedPlayer) sender).getUniqueId(), map);
                     ((SubDataClient) ((Server) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0]).sendPacket(new PacketCheckPermission(((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
@@ -1075,7 +1075,7 @@ public final class SubCommand extends Command implements TabExecutor {
                 } else if (args.length == 4) {
                     List<String> list = new ArrayList<String>();
                     Map<String, Host> hosts = plugin.api.getHosts();
-                    if (!hosts.keySet().contains(args[2].toLowerCase())) {
+                    if (!hosts.containsKey(args[2].toLowerCase())) {
                         list.add("<Template>");
                     } else {
                         for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) {
@@ -1160,7 +1160,7 @@ public final class SubCommand extends Command implements TabExecutor {
             if (sender instanceof ProxiedPlayer) {
                 if (args.length > 0) {
                     Map<String, Server> servers = plugin.api.getServers();
-                    if (servers.keySet().contains(args[0].toLowerCase())) {
+                    if (servers.containsKey(args[0].toLowerCase())) {
                         ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
                     } else {
                         sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.Server.Invalid"));

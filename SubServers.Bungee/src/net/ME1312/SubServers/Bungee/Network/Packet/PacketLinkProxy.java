@@ -66,15 +66,15 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
 
             boolean isnew = false;
             Proxy proxy;
-            if (name != null && proxies.keySet().contains(name.toLowerCase())) {
+            if (name != null && proxies.containsKey(name.toLowerCase())) {
                 proxy = proxies.get(name.toLowerCase());
             } else {
-                proxy = new Proxy((name != null && !proxies.keySet().contains(name.toLowerCase()))?name:null);
+                proxy = new Proxy((name != null && !proxies.containsKey(name.toLowerCase()))?name:null);
                 isnew = true;
                 plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
             }
             HashMap<Integer, SubDataClient> subdata = Try.all.get(() -> Util.reflect(Proxy.class.getDeclaredField("subdata"), proxy));
-            if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
+            if (!subdata.containsKey(channel) || (channel == 0 && subdata.get(0) == null)) {
                 proxy.setSubData(client, channel);
                 if (isnew) plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
                 Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" [+"+channel+"]":""));

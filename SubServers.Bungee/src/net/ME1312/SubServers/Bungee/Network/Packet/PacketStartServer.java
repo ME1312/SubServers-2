@@ -70,7 +70,7 @@ public class PacketStartServer implements PacketObjectIn<Integer>, PacketObjectO
             UUID player =    (data.contains(0x0002)?data.getUUID(0x0002):null);
 
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(name.toLowerCase())) {
+            if (!servers.containsKey(name.toLowerCase())) {
                 client.sendPacket(new PacketStartServer(3, tracker));
             } else if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
                 client.sendPacket(new PacketStartServer(4, tracker));

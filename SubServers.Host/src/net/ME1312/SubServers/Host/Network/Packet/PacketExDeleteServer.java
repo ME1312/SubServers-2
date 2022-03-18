@@ -70,7 +70,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
             YAMLSection info = new YAMLSection((Map<String, ?>) data.getObject(0x0002));
             boolean recycle =             data.getBoolean(0x0003, false);
 
-            if (!host.servers.keySet().contains(name.toLowerCase())) {
+            if (!host.servers.containsKey(name.toLowerCase())) {
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExDeleteServer(1, tracker));
             } else if (host.servers.get(name.toLowerCase()).isRunning()) {
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExDeleteServer(3, tracker));

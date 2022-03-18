@@ -114,7 +114,7 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     public SubCreator.ServerTemplate getTemplate() {
         if (templateV != null) {
             return templateV;
-        } else if (templateS != null && getHost().getCreator().getTemplates().keySet().contains(templateS.toLowerCase())) {
+        } else if (templateS != null && getHost().getCreator().getTemplates().containsKey(templateS.toLowerCase())) {
             return getHost().getCreator().getTemplate(templateS.toLowerCase());
         } else {
             return null;

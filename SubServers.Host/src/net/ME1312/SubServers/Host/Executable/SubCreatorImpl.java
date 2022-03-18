@@ -505,7 +505,7 @@ public class SubCreatorImpl {
     }
 
     public void terminate(String name) {
-        if (this.thread.keySet().contains(name.toLowerCase())) {
+        if (this.thread.containsKey(name.toLowerCase())) {
             if (this.thread.get(name.toLowerCase()).process != null && this.thread.get(name.toLowerCase()).process.isAlive()) {
                 Executable.terminate(this.thread.get(name.toLowerCase()).process);
             } else if (this.thread.get(name.toLowerCase()).isAlive()) {
@@ -524,7 +524,7 @@ public class SubCreatorImpl {
     }
 
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.keySet().contains(name.toLowerCase()) && this.thread.get(name.toLowerCase()).isAlive()) {
+        while (this.thread.containsKey(name.toLowerCase()) && this.thread.get(name.toLowerCase()).isAlive()) {
             Thread.sleep(250);
         }
     }

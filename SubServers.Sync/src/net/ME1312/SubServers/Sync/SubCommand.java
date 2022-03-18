@@ -46,9 +46,9 @@ import java.util.function.Supplier;
 @SuppressWarnings("deprecation")
 public final class SubCommand extends Command implements TabExecutor {
     static HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>> permitted = new HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>>();
-    private TreeMap<String, Proxy> proxyCache = new TreeMap<String, Proxy>();
-    private TreeMap<String, Host> hostCache = new TreeMap<String, Host>();
-    private TreeMap<String, List<Server>> groupCache = new TreeMap<String, List<Server>>();
+    private Map<String, Proxy> proxyCache = Collections.emptyMap();
+    private Map<String, Host> hostCache = Collections.emptyMap();
+    private Map<String, List<Server>> groupCache = Collections.emptyMap();
     private Proxy proxyMasterCache = null;
     private long cacheDate = 0;
     private ExProxy plugin;
@@ -428,7 +428,7 @@ public final class SubCommand extends Command implements TabExecutor {
                                                 if (listening.size() > 0) {
                                                     PacketInExRunEvent.callback("SubStoppedEvent", this);
                                                     String name = json.getString("server").toLowerCase();
-                                                    if (listening.keySet().contains(name)) {
+                                                    if (listening.containsKey(name)) {
                                                         Timer timer = new Timer("SubServers.Sync::Server_Restart_Command_Handler(" + name + ")");
                                                         timer.schedule(new TimerTask() {
                                                             @Override
@@ -948,19 +948,19 @@ public final class SubCommand extends Command implements TabExecutor {
             if (sender instanceof ConsoleCommandSender)
                 new IllegalStateException("SubData is not connected").printStackTrace();
             return Collections.emptyList();
-        } else if (sender instanceof ProxiedPlayer && (!permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+        } else if (sender instanceof ProxiedPlayer && (!permitted.containsKey(((ProxiedPlayer) sender).getUniqueId()) || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).containsKey(((ProxiedPlayer) sender).getServer().getInfo())
                 || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).value())) {
-            if (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) && permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+            if (permitted.containsKey(((ProxiedPlayer) sender).getUniqueId()) && permitted.get(((ProxiedPlayer) sender).getUniqueId()).containsKey(((ProxiedPlayer) sender).getServer().getInfo())
                     && permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).key() == null) {
                 // do nothing
-            } else if (!permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+            } else if (!permitted.containsKey(((ProxiedPlayer) sender).getUniqueId()) || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).containsKey(((ProxiedPlayer) sender).getServer().getInfo())
                     || Calendar.getInstance().getTime().getTime() - permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).key() >= TimeUnit.MINUTES.toMillis(1)) {
                 if (!(((ProxiedPlayer) sender).getServer().getInfo() instanceof ServerImpl) || ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0] == null) {
-                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
+                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (permitted.containsKey(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new ContainedPair<>(Calendar.getInstance().getTime().getTime(), false));
                     permitted.put(((ProxiedPlayer) sender).getUniqueId(), map);
                 } else {
-                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
+                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (permitted.containsKey(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new ContainedPair<>(null, false));
                     permitted.put(((ProxiedPlayer) sender).getUniqueId(), map);
                     ((SubDataSender) ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0]).sendPacket(new PacketCheckPermission(((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
@@ -1150,7 +1150,7 @@ public final class SubCommand extends Command implements TabExecutor {
                 } else if (args.length == 4) {
                     List<String> list = new ArrayList<String>();
                     Map<String, Host> hosts = hostCache;
-                    if (!hosts.keySet().contains(args[2].toLowerCase())) {
+                    if (!hosts.containsKey(args[2].toLowerCase())) {
                         list.add("<Template>");
                     } else {
                         for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) {
@@ -1376,7 +1376,7 @@ public final class SubCommand extends Command implements TabExecutor {
         if (Calendar.getInstance().getTime().getTime() - cacheDate >= TimeUnit.MINUTES.toMillis(1)) {
             cacheDate = Calendar.getInstance().getTime().getTime();
             plugin.api.getProxies(proxies -> {
-                proxyCache = new TreeMap<>(proxies);
+                proxyCache = proxies;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             plugin.api.getMasterProxy(master -> {
@@ -1384,11 +1384,11 @@ public final class SubCommand extends Command implements TabExecutor {
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             plugin.api.getHosts(hosts -> {
-                hostCache = new TreeMap<>(hosts);
+                hostCache = hosts;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             plugin.api.getGroups(groups -> {
-                groupCache = new TreeMap<>(groups);
+                groupCache = groups;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
         }
@@ -1420,7 +1420,7 @@ public final class SubCommand extends Command implements TabExecutor {
                 if (sender instanceof ProxiedPlayer) {
                     if (args.length > 0) {
                         Map<String, ServerImpl> servers = plugin.servers;
-                        if (servers.keySet().contains(args[0].toLowerCase())) {
+                        if (servers.containsKey(args[0].toLowerCase())) {
                             ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
                         } else {
                             sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.Server.Invalid"));

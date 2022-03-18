@@ -324,9 +324,13 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
-            } if (was.compareTo(new Version("22w10a")) <= 0) {
+            } if (was.compareTo(new Version("22w11a")) <= 0) {
                 if (existing.contains("Lang")) {
                     updated.getMap("Lang").remove("Command.Teleport");
+                    LinkedList<String> keys = new LinkedList<>(existing.getMap("Lang").getKeys());
+                    for (String key : keys) if (key.startsWith("Signs.")) {
+                        updated.getMap("Lang").remove(key);
+                    }
                 }
 
                 existing = updated.clone();
@@ -363,11 +367,11 @@ public class ConfigUpdater {
             def.put("Bungee.List.Total", "Total players online: $int$");
             def.put("Signs.Create", "&aSubServers &2&l\\u00BB&a Server sign activated");
             def.put("Signs.Delete", "&aSubServers &2&l\\u00BB&a Server sign removed");
-            def.put("Signs.Text.Error", "&f&oSubServers\\n&3$str$\\n&7Unknown Status\\n&8\\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022");
-            def.put("Signs.Text.Offline", "&c&oSubServers\\n&3#subserver.displayname($str$)\\n&4Offline\\n&7Click to Start");
-            def.put("Signs.Text.Starting", "&e&oSubServers\\n&3#subserver.displayname($str$)\\n&6Starting\\n&8\\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022");
-            def.put("Signs.Text.Online", "&a&oSubServers\\n&3#subserver.displayname($str$)\\n&2#subserver.players($str$) Online\\n&7Click to Join");
-            def.put("Signs.Text.Stopping", "&e&oSubServers\\n&3#subserver.displayname($str$)\\n&6Stopping\\n&8\\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022");
+            def.put("Signs.Text.Unknown", "&f&oSubServers\\n&3$str$\\n&7Unknown Status\\n&8\\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022");
+            def.put("Signs.Text.Offline", "&c&oSubServers\\n&3$str$\\n&4Offline\\n&7Click to Start");
+            def.put("Signs.Text.Starting", "&e&oSubServers\\n&3$str$\\n&6Starting\\n&8\\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022");
+            def.put("Signs.Text.Online", "&a&oSubServers\\n&3$str$\\n&2$int$ Online\\n&7Click to Join");
+            def.put("Signs.Text.Stopping", "&e&oSubServers\\n&3$str$\\n&6Stopping\\n&8\\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022 \\u2022");
             def.put("Command.Generic.Player-Only", "&cSubServers &4&l\\u00BB&c The console cannot perform this command");
             def.put("Command.Generic.Console-Only", "&cSubServers &4&l\\u00BB&c This command is for console use only");
             def.put("Command.Generic.Usage", "&7SubServers &8&l\\u00BB&7 Usage: &f$str$");

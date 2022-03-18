@@ -455,8 +455,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
         autorun = new LinkedList<String>();
         for (String name : this.servers.get().getMap("Servers").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
-                if (!this.hosts.keySet().contains(this.servers.get().getMap("Servers").getMap(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + this.servers.get().getMap("Servers").getMap(name).getString("Host"));
-                if (exServers.keySet().contains(name.toLowerCase())) {
+                if (!this.hosts.containsKey(this.servers.get().getMap("Servers").getMap(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + this.servers.get().getMap("Servers").getMap(name).getString("Host"));
+                if (exServers.containsKey(name.toLowerCase())) {
                     exServers.remove(name.toLowerCase());
                     servers--;
                 }
@@ -1001,11 +1001,11 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public void validate(ServerConnectEvent e) {
         if (e.getPlayer().isConnected()) {
             Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(api.getServers());
-            if (servers.keySet().contains(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
+            if (servers.containsKey(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
                 e.setTarget(servers.get(e.getTarget().getName().toLowerCase()));
             } else {
                 servers = getServersCopy();
-                if (servers.keySet().contains(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
+                if (servers.containsKey(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
                     e.setTarget(servers.get(e.getTarget().getName()));
                 }
             }

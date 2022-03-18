@@ -766,7 +766,7 @@ public final class SubCommand implements CommandExecutor {
                                         if (listening.size() > 0) {
                                             PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             String name = json.getString("server").toLowerCase();
-                                            if (listening.keySet().contains(name)) {
+                                            if (listening.containsKey(name)) {
                                                 plugin.game.getScheduler().createTaskBuilder().execute(() -> {
                                                     starter.accept(listening.get(name));
                                                     listening.remove(name);

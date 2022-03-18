@@ -131,7 +131,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
     @SuppressWarnings("unchecked")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        if (callbacks.keySet().contains(data.getString(0x0000))) {
+        if (callbacks.containsKey(data.getString(0x0000))) {
             for (Consumer<ObjectMap<String>> callback : PacketInExRunEvent.callbacks.remove(data.getString(0x0000))) {
                 callback.accept(new ObjectMap<>((Map<String, ?>) data.getObject(0x0001)));
             }
@@ -139,7 +139,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
     }
 
     public static void callback(String event, Consumer<ObjectMap<String>> callback) {
-        List<Consumer<ObjectMap<String>>> callbacks = (PacketInExRunEvent.callbacks.keySet().contains(event))? PacketInExRunEvent.callbacks.get(event):new ArrayList<Consumer<ObjectMap<String>>>();
+        List<Consumer<ObjectMap<String>>> callbacks = (PacketInExRunEvent.callbacks.containsKey(event))? PacketInExRunEvent.callbacks.get(event):new ArrayList<Consumer<ObjectMap<String>>>();
         callbacks.add(callback);
         PacketInExRunEvent.callbacks.put(event, callbacks);
     }

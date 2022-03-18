@@ -40,7 +40,7 @@ public final class ConsoleCommand {
                             if (server != null) {
                                 if (server.isRunning()) {
                                     Logger.get("SubConsole").info("Opening console window...");
-                                    if (!plugin.sCurrent.keySet().contains(name.toLowerCase())) {
+                                    if (!plugin.sCurrent.containsKey(name.toLowerCase())) {
                                         ConsoleWindow window = new ConsoleWindow(plugin, server.getLogger());
                                         plugin.sCurrent.put(name.toLowerCase(), window);
                                         window.open();
@@ -67,7 +67,7 @@ public final class ConsoleCommand {
                                 if (host.getCreator().getReservedNames().size() > 0) {
                                     sender.sendMessage("SubConsole > Opening console window" + ((host.getCreator().getReservedNames().size() == 1)?"":"s") + "...");
                                     for (String reserved : host.getCreator().getReservedNames()) {
-                                        if (!plugin.cCurrent.keySet().contains(reserved.toLowerCase())) {
+                                        if (!plugin.cCurrent.containsKey(reserved.toLowerCase())) {
                                             ConsoleWindow window = new ConsoleWindow(plugin, host.getCreator().getLogger(reserved));
                                             plugin.cCurrent.put(reserved.toLowerCase(), window);
                                             window.open();

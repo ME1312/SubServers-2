@@ -713,12 +713,12 @@ public class DefaultUIRenderer extends UIRenderer {
                     } else {
                         for (String name : sgl) {
                             String group = name;
-                            if (conflitresolver.keySet().contains(name.toLowerCase())) {
+                            if (conflitresolver.containsKey(name.toLowerCase())) {
                                 group = conflitresolver.get(name.toLowerCase());
                             } else {
                                 conflitresolver.put(name.toLowerCase(), name);
                             }
-                            List<Server> list = (groups.keySet().contains(group))? groups.get(group) : new ArrayList<Server>();
+                            List<Server> list = (groups.containsKey(group))? groups.get(group) : new ArrayList<Server>();
                             list.add(server);
                             groups.put(group, list);
                         }

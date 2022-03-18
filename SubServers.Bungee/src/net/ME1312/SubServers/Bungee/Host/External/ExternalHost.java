@@ -81,7 +81,7 @@ public class ExternalHost extends Host implements ClientHandler {
         if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
         if (client == null && channel == 0) available = false;
         if (client != null || channel == 0) {
-            if (!subdata.keySet().contains(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
+            if (!subdata.containsKey(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
                 subdata.put(channel, (SubDataClient) client);
                 if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
             }

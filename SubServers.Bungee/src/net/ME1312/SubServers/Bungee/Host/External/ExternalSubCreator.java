@@ -94,7 +94,7 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Consumer<SubServer> callback) {
         Util.nullpo(name, template);
-        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name) && (version != null || !template.requiresVersion())) {
+        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().containsKey(name.toLowerCase()) && !SubCreator.isReserved(name) && (version != null || !template.requiresVersion())) {
             StackTraceElement[] origin = new Throwable().getStackTrace();
 
             if (port == null) {
@@ -174,7 +174,7 @@ public class ExternalSubCreator extends SubCreator {
                 Logger.get(prefix).info("Saving...");
                 SubServer subserver = update;
                 if (update == null || update.getTemplate() != template || template.getBuildOptions().getBoolean("Update-Settings", false)) {
-                    if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
+                    if (host.plugin.exServers.containsKey(name.toLowerCase()))
                         host.plugin.exServers.remove(name.toLowerCase());
 
                     ObjectMap<String> server = new ObjectMap<String>();
@@ -257,7 +257,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void terminate(String name) {
-        if (this.thread.keySet().contains(name.toLowerCase())) {
+        if (this.thread.containsKey(name.toLowerCase())) {
             ((SubDataClient) host.getSubData()[0]).sendPacket(new PacketExCreateServer(name.toLowerCase()));
             thread.remove(name.toLowerCase());
         }
@@ -274,7 +274,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.keySet().contains(name.toLowerCase()) && host.getSubData()[0] != null) {
+        while (this.thread.containsKey(name.toLowerCase()) && host.getSubData()[0] != null) {
             Thread.sleep(250);
         }
     }

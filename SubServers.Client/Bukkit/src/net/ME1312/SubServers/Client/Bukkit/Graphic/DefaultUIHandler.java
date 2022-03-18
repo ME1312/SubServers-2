@@ -497,7 +497,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
      */
     @EventHandler
     public void close(InventoryCloseEvent event) {
-        if (gui.keySet().contains(event.getPlayer().getUniqueId())) gui.get(event.getPlayer().getUniqueId()).open = false;
+        if (gui.containsKey(event.getPlayer().getUniqueId())) gui.get(event.getPlayer().getUniqueId()).open = false;
     }
 
     /**
@@ -507,7 +507,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
      */
     @EventHandler
     public void clean(PlayerQuitEvent event) {
-        if (gui.keySet().contains(event.getPlayer().getUniqueId())) {
+        if (gui.containsKey(event.getPlayer().getUniqueId())) {
             gui.get(event.getPlayer().getUniqueId()).setDownloading(null);
             gui.remove(event.getPlayer().getUniqueId());
             input.remove(event.getPlayer().getUniqueId());

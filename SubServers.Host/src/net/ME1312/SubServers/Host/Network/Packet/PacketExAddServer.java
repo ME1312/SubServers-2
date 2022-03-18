@@ -80,7 +80,7 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
             String stopcmd = data.getString(0x0007);
             UUID running =       data.contains(0x0008)?data.getUUID(0x0008):null;
 
-            if (host.servers.keySet().contains(name.toLowerCase())) {
+            if (host.servers.containsKey(name.toLowerCase())) {
                 SubServerImpl server = host.servers.get(name.toLowerCase());
                 if (server.getPort() == port && server.getExecutable().equals(exec) && server.getPath().equals(dir)) {
                     if (server.isEnabled() != enabled || server.getLogger().isLogging() != log || !server.getStopCommand().equals(stopcmd)) {

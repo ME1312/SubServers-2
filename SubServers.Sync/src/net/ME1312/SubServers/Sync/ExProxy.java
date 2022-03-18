@@ -499,11 +499,11 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public void validate(ServerConnectEvent e) {
         if (e.getPlayer().isConnected()) {
             Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(this.servers);
-            if (servers.keySet().contains(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
+            if (servers.containsKey(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
                 e.setTarget(servers.get(e.getTarget().getName().toLowerCase()));
             } else {
                 servers = getServers();
-                if (servers.keySet().contains(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
+                if (servers.containsKey(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
                     e.setTarget(servers.get(e.getTarget().getName()));
                 }
             }
@@ -678,13 +678,13 @@ public final class ExProxy extends BungeeCommon implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void start(SubStartEvent e) {
-        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerImpl)
+        if (servers.containsKey(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerImpl)
             ((SubServerImpl) servers.get(e.getServer().toLowerCase())).setRunning(true);
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void stop(SubStoppedEvent e) {
-        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerImpl)
+        if (servers.containsKey(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerImpl)
             ((SubServerImpl) servers.get(e.getServer().toLowerCase())).setRunning(false);
     }
 

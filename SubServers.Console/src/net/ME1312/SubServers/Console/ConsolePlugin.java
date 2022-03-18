@@ -76,7 +76,7 @@ public final class ConsolePlugin extends Plugin implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerCreate(SubCreateEvent event) {
         if (!event.isCancelled()) {
-            if (!cCurrent.keySet().contains(event.getHost().getName().toLowerCase())) {
+            if (!cCurrent.containsKey(event.getHost().getName().toLowerCase())) {
                 cCurrent.put(event.getName().toLowerCase(), new ConsoleWindow(this, event.getHost().getCreator().getLogger(event.getName().toLowerCase())));
             } else {
                 cCurrent.get(event.getName().toLowerCase()).clear();
@@ -90,7 +90,7 @@ public final class ConsolePlugin extends Plugin implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerStart(SubStartEvent event) {
         if (!event.isCancelled()) {
-            if (!sCurrent.keySet().contains(event.getServer().getName().toLowerCase())) {
+            if (!sCurrent.containsKey(event.getServer().getName().toLowerCase())) {
                 sCurrent.put(event.getServer().getName().toLowerCase(), new ConsoleWindow(this, event.getServer().getLogger()));
             } else {
                 sCurrent.get(event.getServer().getName().toLowerCase()).clear();
@@ -103,7 +103,7 @@ public final class ConsolePlugin extends Plugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerCommand(SubSendCommandEvent event) {
-        if (!event.isCancelled() && sCurrent.keySet().contains(event.getServer().getName().toLowerCase())) {
+        if (!event.isCancelled() && sCurrent.containsKey(event.getServer().getName().toLowerCase())) {
             RemotePlayer player = (event.getPlayer() == null)? null : SubAPI.getInstance().getRemotePlayer(event.getPlayer());
             sCurrent.get(event.getServer().getName().toLowerCase()).log(((player == null)? "CONSOLE" : player.getName()) + "> /" + event.getCommand());
         }

@@ -60,15 +60,15 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
 
             if (name.contains(" ")) {
                 client.sendPacket(new PacketCreateServer(3, tracker));
-            } else if (plugin.api.getSubServers().keySet().contains(name.toLowerCase()) || SubCreator.isReserved(name)) {
+            } else if (plugin.api.getSubServers().containsKey(name.toLowerCase()) || SubCreator.isReserved(name)) {
                 client.sendPacket(new PacketCreateServer(4, tracker));
-            } else if (!plugin.hosts.keySet().contains(host.toLowerCase())) {
+            } else if (!plugin.hosts.containsKey(host.toLowerCase())) {
                 client.sendPacket(new PacketCreateServer(5, tracker));
             } else if (!plugin.hosts.get(host.toLowerCase()).isAvailable()) {
                 client.sendPacket(new PacketCreateServer(6, tracker));
             } else if (!plugin.hosts.get(host.toLowerCase()).isEnabled()) {
                 client.sendPacket(new PacketCreateServer(7, tracker));
-            } else if (!plugin.hosts.get(host.toLowerCase()).getCreator().getTemplates().keySet().contains(template.toLowerCase())) {
+            } else if (!plugin.hosts.get(host.toLowerCase()).getCreator().getTemplates().containsKey(template.toLowerCase())) {
                 client.sendPacket(new PacketCreateServer(8, tracker));
             } else if (!plugin.hosts.get(host.toLowerCase()).getCreator().getTemplate(template).isEnabled()) {
                 client.sendPacket(new PacketCreateServer(9, tracker));

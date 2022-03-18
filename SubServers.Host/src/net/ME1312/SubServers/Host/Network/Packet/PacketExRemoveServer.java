@@ -60,7 +60,7 @@ public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObje
         UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
             String name = data.getString(0x0001);
-            if (!host.servers.keySet().contains(name.toLowerCase())) {
+            if (!host.servers.containsKey(name.toLowerCase())) {
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExRemoveServer(1, tracker));
             } else if (host.servers.get(name.toLowerCase()).isRunning()) {
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExRemoveServer(3, tracker));

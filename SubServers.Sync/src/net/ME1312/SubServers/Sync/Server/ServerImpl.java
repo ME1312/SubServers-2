@@ -82,7 +82,7 @@ public class ServerImpl extends BungeeServerInfo {
     public void setSubData(UUID client, int channel) {
         if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
         if (client != null || channel == 0) {
-            if (!subdata.keySet().contains(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
+            if (!subdata.containsKey(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
                 subdata.put(channel, client);
             }
         } else {

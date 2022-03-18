@@ -59,7 +59,7 @@ public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjec
             UUID target =    (data.contains(0x0004)?data.getUUID(0x0004):null);
 
             Map<String, Server> servers = plugin.api.getServers();
-            if (!server.equals("*") && !servers.keySet().contains(server.toLowerCase())) {
+            if (!server.equals("*") && !servers.containsKey(server.toLowerCase())) {
                 client.sendPacket(new PacketCommandServer(3, tracker));
             } else if (!server.equals("*") && !(target == null && servers.get(server.toLowerCase()) instanceof SubServer) && servers.get(server.toLowerCase()).getSubData()[0] == null) {
                 client.sendPacket(new PacketCommandServer(4, tracker));

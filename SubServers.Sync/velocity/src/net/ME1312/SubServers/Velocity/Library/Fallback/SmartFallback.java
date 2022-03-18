@@ -143,7 +143,7 @@ public class SmartFallback {
                 }
 
                 if (valid) {
-                    List<RegisteredServer> servers = (score.keySet().contains(confidence))?score.get(confidence):new LinkedList<RegisteredServer>();
+                    List<RegisteredServer> servers = (score.containsKey(confidence))?score.get(confidence):new LinkedList<RegisteredServer>();
                     servers.add(server);
                     score.put(confidence, servers);
                 }

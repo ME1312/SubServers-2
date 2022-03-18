@@ -15,7 +15,7 @@ public class ReplacementScanner extends FileScanner {
         TreeMap<Integer, LinkedList<String>> order = new TreeMap<Integer, LinkedList<String>>(Comparator.reverseOrder());
         for (String key : replacements.keySet()) {
             int length = key.length();
-            if (!order.keySet().contains(length)) order.put(length, new LinkedList<>());
+            if (!order.containsKey(length)) order.put(length, new LinkedList<>());
             order.get(length).add(key);
         }
 

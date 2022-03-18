@@ -30,10 +30,10 @@ import java.util.function.Supplier;
  * Command Class
  */
 public class SubCommand {
-    private static TreeMap<String, Proxy> proxyCache = new TreeMap<String, Proxy>();
-    private static TreeMap<String, Host> hostCache = new TreeMap<String, Host>();
-    private static TreeMap<String, List<Server>> groupCache = new TreeMap<String, List<Server>>();
-    private static TreeMap<String, Server> serverCache = new TreeMap<String, Server>();
+    private static Map<String, Proxy> proxyCache = Collections.emptyMap();
+    private static Map<String, Host> hostCache = Collections.emptyMap();
+    private static Map<String, List<Server>> groupCache = Collections.emptyMap();
+    private static Map<String, Server> serverCache = Collections.emptyMap();
     private static Proxy proxyMasterCache = null;
     private static long cacheDate = 0;
     private final ExHost host;
@@ -554,7 +554,7 @@ public class SubCommand {
                                             if (listening.size() > 0) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
                                                 String name = json.getString("server").toLowerCase();
-                                                if (listening.keySet().contains(name)) {
+                                                if (listening.containsKey(name)) {
                                                     Timer timer = new Timer("SubServers.Host::Server_Restart_Command_Handler(" + name + ")");
                                                     timer.schedule(new TimerTask() {
                                                         @Override
@@ -817,7 +817,7 @@ public class SubCommand {
             } else if (args.length == 3) {
                 List<String> list = new ArrayList<String>();
                 Map<String, Host> hosts = hostCache;
-                if (hosts.keySet().contains(args[1].toLowerCase())) {
+                if (hosts.containsKey(args[1].toLowerCase())) {
                     for (SubCreator.ServerTemplate template : hosts.get(args[1].toLowerCase()).getCreator().getTemplates().values()) {
                         if (template.getName().toLowerCase().startsWith(last)) list.add(Last + template.getName().substring(last.length()));
                     }
@@ -1355,7 +1355,7 @@ public class SubCommand {
         if (Calendar.getInstance().getTime().getTime() - cacheDate >= TimeUnit.MINUTES.toMillis(1)) {
             cacheDate = Calendar.getInstance().getTime().getTime();
             SubAPI.getInstance().getProxies(proxies -> {
-                proxyCache = new TreeMap<>(proxies);
+                proxyCache = proxies;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             SubAPI.getInstance().getMasterProxy(master -> {
@@ -1363,15 +1363,15 @@ public class SubCommand {
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             SubAPI.getInstance().getHosts(hosts -> {
-                hostCache = new TreeMap<>(hosts);
+                hostCache = hosts;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             SubAPI.getInstance().getGroups(groups -> {
-                groupCache = new TreeMap<>(groups);
+                groupCache = groups;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             SubAPI.getInstance().getServers(servers -> {
-                serverCache = new TreeMap<>(servers);
+                serverCache = servers;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
         }

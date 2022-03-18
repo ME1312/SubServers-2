@@ -59,12 +59,12 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
             Map<String, Host> hosts = plugin.api.getHosts();
-            if (hosts.keySet().contains(data.getString(0x0000).toLowerCase())) {
+            if (hosts.containsKey(data.getString(0x0000).toLowerCase())) {
                 Host host = hosts.get(data.getString(0x0000).toLowerCase());
                 if (host instanceof ExternalHost) {
                     Integer channel = data.getInt(0x0001);
                     HashMap<Integer, SubDataClient> subdata = Try.all.get(() -> Util.reflect(ExternalHost.class.getDeclaredField("subdata"), host));
-                    if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
+                    if (!subdata.containsKey(channel) || (channel == 0 && subdata.get(0) == null)) {
                         ((ExternalHost) host).setSubData(client, channel);
                         Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" [+"+channel+"]":""));
                         queue(host.getName(), () -> client.sendPacket(new PacketLinkExHost(0, null)));

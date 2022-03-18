@@ -58,7 +58,7 @@ public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjec
 
             Runnable starter = () -> {
                 Map<String, Server> servers = plugin.api.getServers();
-                if (!servers.keySet().contains(name.toLowerCase())) {
+                if (!servers.containsKey(name.toLowerCase())) {
                 } else if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
                 } else if (!((SubServer) servers.get(name.toLowerCase())).getHost().isAvailable()) {
                 } else if (!((SubServer) servers.get(name.toLowerCase())).getHost().isEnabled()) {
@@ -72,7 +72,7 @@ public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjec
             };
 
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(name.toLowerCase())) {
+            if (!servers.containsKey(name.toLowerCase())) {
                 client.sendPacket(new PacketRestartServer(3, tracker));
             } else if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
                 client.sendPacket(new PacketRestartServer(4, tracker));
