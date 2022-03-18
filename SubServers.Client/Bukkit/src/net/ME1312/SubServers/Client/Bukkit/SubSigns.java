@@ -190,7 +190,7 @@ public class SubSigns implements Listener {
     }
 
     private void refresh(SubServer server) {
-        if (plugin.lang != null) {
+        if (server != null && plugin.lang != null) {
             String name;
             for (Entry<Location, String> pos : signs.entrySet()) {
                 if ((name = pos.getValue()).equalsIgnoreCase(server.getName())) {
