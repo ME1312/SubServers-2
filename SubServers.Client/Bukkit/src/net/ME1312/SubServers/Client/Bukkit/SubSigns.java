@@ -122,14 +122,15 @@ public class SubSigns implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void create(SignChangeEvent e) {
-        if (!e.isCancelled() && e.getLine(0).trim().equalsIgnoreCase("[SubServers]") && plugin.lang != null) {
-            Player player = e.getPlayer();
+        if (!e.isCancelled() && e.getLine(0).trim().equalsIgnoreCase("[SubServers]")) {
             String name = e.getLine(1).trim();
-            if (name.length() > 0 && player.hasPermission("subservers.signs")) {
-                Location location = e.getBlock().getLocation();
-                if (location.getBlock().getState() instanceof Sign) {
-                    HashMap<Location, Supplier<?>> signs = new HashMap<Location, Supplier<?>>(SubSigns.signs);
+            if (name.length() > 0 && plugin.lang != null) {
+                Player player = e.getPlayer();
+                if (player.hasPermission("subservers.signs")) {
                     Supplier<?> translator = translate(name);
+                    Location location = e.getBlock().getLocation();
+
+                    HashMap<Location, Supplier<?>> signs = new HashMap<Location, Supplier<?>>(SubSigns.signs);
                     signs.put(location, translator);
                     SubSigns.data.put(new OfflineBlock(location), name);
                     SubSigns.signs = signs;
@@ -288,50 +289,53 @@ public class SubSigns implements Listener {
     @SuppressWarnings("unchecked")
     @EventHandler(priority = EventPriority.MONITOR)
     public void interact(PlayerInteractEvent e) {
-        if (!e.isCancelled() && e.getClickedBlock() != null && signs.containsKey(e.getClickedBlock().getLocation()) && plugin.lang != null) {
-            Player player = e.getPlayer();
-            if (player.hasPermission("subservers.teleport") && (e.getAction() == Action.RIGHT_CLICK_BLOCK || !player.hasPermission("subservers.signs"))) {
-                Object object = signs.get(e.getClickedBlock().getLocation()).get();
+        if (!e.isCancelled() && e.getClickedBlock() != null && e.getClickedBlock().getState() instanceof Sign) {
+            Supplier<?> translator = signs.get(e.getClickedBlock().getLocation());
+            if (translator != null && plugin.lang != null) {
+                Player player = e.getPlayer();
+                if (player.hasPermission("subservers.teleport") && (e.getAction() == Action.RIGHT_CLICK_BLOCK || !player.hasPermission("subservers.signs"))) {
+                    Object object = translator.get();
 
-                Collection<? extends Server> servers;
-                if (object instanceof Server) {
-                    servers = Collections.singleton((Server) object);
-                } else if (object instanceof Pair) {
-                    servers = ((Pair<String, List<Server>>) object).value();
-                } else if (object instanceof Host) {
-                    servers = ((Host) object).getSubServers().values();
-                } else {
-                    return;
-                }
+                    Collection<? extends Server> servers;
+                    if (object instanceof Server) {
+                        servers = Collections.singleton((Server) object);
+                    } else if (object instanceof Pair) {
+                        servers = ((Pair<String, List<Server>>) object).value();
+                    } else if (object instanceof Host) {
+                        servers = ((Host) object).getSubServers().values();
+                    } else {
+                        return;
+                    }
 
-                Text incoming, state = Text.UNKNOWN;
-                List<Server> selected = new ArrayList<>();
-                for (Server server : servers) {
-                    incoming = Text.determine(server);
-                    if (incoming != Text.STOPPING) {
-                        if (incoming == Text.OFFLINE) {
-                            SubServer subserver = (SubServer) server;
-                            if (!(subserver.isEnabled() && subserver.isAvailable() && subserver.getCurrentIncompatibilities().size() == 0)) continue;
-                        }
+                    Text incoming, state = Text.UNKNOWN;
+                    List<Server> selected = new ArrayList<>();
+                    for (Server server : servers) {
+                        incoming = Text.determine(server);
+                        if (incoming != Text.STOPPING) {
+                            if (incoming == Text.OFFLINE) {
+                                SubServer subserver = (SubServer) server;
+                                if (!(subserver.isEnabled() && subserver.isAvailable() && subserver.getCurrentIncompatibilities().size() == 0)) continue;
+                            }
 
-                        if (incoming.priority > state.priority) {
-                            selected.clear();
-                            state = incoming;
-                        }
+                            if (incoming.priority > state.priority) {
+                                selected.clear();
+                                state = incoming;
+                            }
 
-                        if (incoming == state) {
-                            selected.add(server);
+                            if (incoming == state) {
+                                selected.add(server);
+                            }
                         }
                     }
-                }
 
-                if (selected.size() > 0) {
-                    Server server = selected.get(new Random().nextInt(selected.size()));
-                    if (state == Text.OFFLINE) {
-                        ((SubServer) server).start();
-                    } else {
-                        player.sendMessage(plugin.api.getLang("SubServers", "Command.Teleport").replace("$name$", player.getName()).replace("$str$", server.getDisplayName()));
-                        plugin.pmc(player, "Connect", server.getName());
+                    if (selected.size() > 0) {
+                        Server server = selected.get(new Random().nextInt(selected.size()));
+                        if (state == Text.OFFLINE) {
+                            ((SubServer) server).start();
+                        } else {
+                            player.sendMessage(plugin.api.getLang("SubServers", "Command.Teleport").replace("$name$", player.getName()).replace("$str$", server.getDisplayName()));
+                            plugin.pmc(player, "Connect", server.getName());
+                        }
                     }
                 }
             }
@@ -342,7 +346,7 @@ public class SubSigns implements Listener {
     public void delete(BlockBreakEvent e) {
         if (!e.isCancelled() && e.getBlock().getState() instanceof Sign && signs.containsKey(e.getBlock().getLocation())) {
             Player player = e.getPlayer();
-            if (plugin.lang != null && player.hasPermission("subservers.signs")) {
+            if (player.hasPermission("subservers.signs") && plugin.lang != null) {
                 Location location = e.getBlock().getLocation();
                 String name = data.remove(new OfflineBlock(location));
                 if (name != null) locations.remove(name.toLowerCase());
