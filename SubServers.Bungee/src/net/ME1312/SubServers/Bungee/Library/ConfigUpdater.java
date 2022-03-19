@@ -324,13 +324,9 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
-            } if (was.compareTo(new Version("22w11a")) <= 0) {
+            } if (was.compareTo(new Version("22w07c")) <= 0) {
                 if (existing.contains("Lang")) {
                     updated.getMap("Lang").remove("Command.Teleport");
-                    LinkedList<String> keys = new LinkedList<>(existing.getMap("Lang").getKeys());
-                    for (String key : keys) if (key.startsWith("Signs.")) {
-                        updated.getMap("Lang").remove(key);
-                    }
                 }
 
                 existing = updated.clone();
