@@ -314,15 +314,14 @@ public class SubSigns implements Listener {
                         if (incoming != Text.STOPPING) {
                             if (incoming == Text.OFFLINE) {
                                 SubServer subserver = (SubServer) server;
-                                if (!(subserver.isEnabled() && subserver.isAvailable() && subserver.getCurrentIncompatibilities().size() == 0)) continue;
+                                if (!subserver.isEnabled() || !subserver.isAvailable() || subserver.getCurrentIncompatibilities().size() != 0) continue;
                             }
 
                             if (incoming.priority > state.priority) {
-                                selected.clear();
                                 state = incoming;
-                            }
-
-                            if (incoming == state) {
+                                selected.clear();
+                                selected.add(server);
+                            } else if (incoming == state) {
                                 selected.add(server);
                             }
                         }
