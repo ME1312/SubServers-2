@@ -17,11 +17,11 @@ import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.PlaceholderImpl;
-import net.ME1312.SubServers.Client.Bukkit.Library.Placeholders;
 import net.ME1312.SubServers.Client.Bukkit.Library.ConfigUpdater;
 import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
+import net.ME1312.SubServers.Client.Bukkit.Library.Placeholders;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubProtocol;
-
+import net.ME1312.SubServers.Client.Bukkit.SubSigns.SubSigns;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
@@ -57,6 +57,8 @@ public final class SubPlugin extends JavaPlugin {
     public final Placeholders phi = new Placeholders(this);
     public String server_address;
 
+    private SubSigns subSigns;
+
     private MethodHandle gson;
     private long resetDate = 0;
     private boolean reconnect = false;
@@ -64,7 +66,7 @@ public final class SubPlugin extends JavaPlugin {
     @SuppressWarnings("ConstantConditions")
     public SubPlugin() throws Throwable {
         super();
-        Class<?> gson = Class.forName(((Try.all.get(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
+        Class<?> gson = Class.forName(((Try.all.get(() -> Class.forName("com.google.gson.Gson") != null, false) ? "" : "org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
         this.gson = Access.shared.type(gson).method("fromJson").instance(gson.newInstance()).parameters(String.class, Class.class).returns(Object.class).handle();
         version = Version.fromString(getDescription().getVersion());
         subdata.put(0, null);
@@ -130,7 +132,7 @@ public final class SubPlugin extends JavaPlugin {
 
             gui = new DefaultUIHandler(this);
             if (api.access.value > NO_COMMANDS.value && !config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
-                Bukkit.getPluginManager().registerEvents(new SubSigns(this, new File(dir, "signs.dat")), this);
+                this.subSigns = new SubSigns(this, new File(dir, "signs.dat"));
                 CommandMap cmd = Util.reflect(Bukkit.getServer().getClass().getDeclaredField("commandMap"), Bukkit.getServer());
 
                 cmd.register("subservers", new SubCommand(this, "subservers"));
@@ -159,8 +161,10 @@ public final class SubPlugin extends JavaPlugin {
                             updcount++;
                         }
                     }
-                    if (updcount > 0) Bukkit.getLogger().info("SubServers > SubServers.Client.Bukkit v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
-                } catch (Throwable e) {}
+                    if (updcount > 0)
+                        Bukkit.getLogger().info("SubServers > SubServers.Client.Bukkit v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1) ? "" : "s") + " behind.");
+                } catch (Throwable e) {
+                }
             }, 0, TimeUnit.DAYS.toSeconds(2) * 20);
         } catch (Throwable e) {
             e.printStackTrace();
@@ -209,7 +213,7 @@ public final class SubPlugin extends JavaPlugin {
                         Bukkit.getScheduler().runTaskLater(SubPlugin.this, this, reconnect * 20);
                     }
                 }
-            }, (disconnect == null)?0:reconnect * 20);
+            }, (disconnect == null) ? 0 : reconnect * 20L);
         }
     }
 
@@ -222,15 +226,16 @@ public final class SubPlugin extends JavaPlugin {
             setEnabled(false);
             reconnect = false;
 
-            ArrayList<SubDataClient> temp = new ArrayList<SubDataClient>();
-            temp.addAll(subdata.values());
-            for (SubDataClient client : temp) if (client != null)  {
-                client.close();
-                client.waitFor();
+            ArrayList<SubDataClient> temp = new ArrayList<>(subdata.values());
+            for (SubDataClient client : temp) {
+                if (client != null) {
+                    client.close();
+                    client.waitFor();
+                }
             }
             subdata.clear();
             subdata.put(0, null);
-            SubSigns.save();
+            this.subSigns.save();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -244,13 +249,13 @@ public final class SubPlugin extends JavaPlugin {
      */
     @SuppressWarnings("unchecked")
     public Map<String, ?> parseJSON(String json) throws Throwable {
-        return (Map<String, ?>) (Object) gson.invokeExact(json, Map.class);
+        return (Map<String, ?>) gson.invokeExact(json, Map.class);
     }
 
     /**
      * Send a message to the BungeeCord Plugin Messaging Channel
      *
-     * @param player Player that will send
+     * @param player  Player that will send
      * @param message Message contents
      */
     public void pmc(Player player, String... message) {
@@ -265,5 +270,9 @@ public final class SubPlugin extends JavaPlugin {
         }
 
         player.sendPluginMessage(this, "BungeeCord", stream.toByteArray());
+    }
+
+    public Pair<Long, Map<String, Map<String, String>>> getLang() {
+        return lang;
     }
 }
