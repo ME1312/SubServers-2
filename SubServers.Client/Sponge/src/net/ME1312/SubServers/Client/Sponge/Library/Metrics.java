@@ -22,9 +22,7 @@ import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * bStats collects some data for plugin authors.
- *
- * Check out https://bStats.org/ to learn more about bStats!
+ * SubServers BStats Metrics Implementation
  */
 public class Metrics {
 

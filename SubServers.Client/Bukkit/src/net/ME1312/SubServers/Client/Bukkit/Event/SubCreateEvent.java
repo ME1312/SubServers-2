@@ -36,6 +36,7 @@ public class SubCreateEvent extends Event implements SubEvent {
      * @param port Server Port Number
      */
     public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port, boolean update) {
+        super(true);
         Util.nullpo(host, name, template, port);
         this.player = player;
         this.update = update;

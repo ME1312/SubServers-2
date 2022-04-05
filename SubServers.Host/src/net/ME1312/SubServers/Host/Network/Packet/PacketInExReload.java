@@ -28,7 +28,7 @@ public class PacketInExReload implements PacketObjectIn<Integer> {
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         Logger log = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
-        if (data != null && data.contains(0x0000)) log.warning("Received request for a plugin reload: " + data.getString(0x0000));
+        if (data != null && data.contains(0x0000)) log.warning("Received request for an app reload: " + data.getString(0x0000));
      // else log.warning("Received request for a plugin reload");
         new Thread(() -> {
             try {

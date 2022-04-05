@@ -34,7 +34,7 @@ public class JNA {
             File jna = new File(library, "jna-" + JNA_VERSION + ".jar");
             jna.getParentFile().mkdirs();
             if (!jna.exists()) {
-                log.info.println("Downloading JNA Library v" + JNA_VERSION);
+                log.info.println("Downloading JNA v" + JNA_VERSION);
                 announced = true;
                 try (InputStream in = new URL(JNA_DOWNLOAD.replace("$1", "jna")).openStream()) {
                     Files.copy(in, jna.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -46,7 +46,7 @@ public class JNA {
             File platform = new File(library, "jna-platform-" + JNA_VERSION + ".jar");
             platform.getParentFile().mkdirs();
             if (!platform.exists()) {
-                if (!announced) log.info.println("Downloading JNA Library v" + JNA_VERSION);
+                if (!announced) log.info.println("Downloading JNA platform v" + JNA_VERSION);
                 announced = true;
                 try (InputStream in = new URL(JNA_DOWNLOAD.replace("$1", "jna-platform")).openStream()) {
                     Files.copy(in, platform.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -56,15 +56,15 @@ public class JNA {
                 }
             }
             if (jna.exists() && platform.exists()) {
-                if (announced) log.info.println("Loading JNA Library");
+                if (announced) log.info.println("JNA download complete");
                 try {
                     JNA = new URLClassLoader(new URL[]{jna.toURI().toURL(), platform.toURI().toURL()});
                 } catch (Throwable e) {
-                    log.error.println("Could not load JNA Library:");
+                    log.error.println("Couldn't load JNA:");
                     log.error.println(e);
                 }
             } else {
-                log.error.println("Could not load JNA Library:");
+                log.error.println("Couldn't load JNA:");
                 log.error.println(new FileNotFoundException());
             }
         }

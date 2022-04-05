@@ -18,6 +18,7 @@ public class SubStoppedEvent extends Event implements SubEvent {
      * @param server Server that Stopped
      */
     public SubStoppedEvent(String server) {
+        super(true);
         Util.nullpo(server);
         this.server = server;
     }

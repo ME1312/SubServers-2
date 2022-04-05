@@ -52,6 +52,7 @@ public final class SubPlugin extends JavaPlugin {
     public SubProtocol subprotocol;
 
     public UIHandler gui = null;
+    public SubSigns signs = null;
     public final Version version;
     public final SubAPI api = new SubAPI(this);
     public final Placeholders phi = new Placeholders(this);
@@ -130,7 +131,7 @@ public final class SubPlugin extends JavaPlugin {
 
             gui = new DefaultUIHandler(this);
             if (api.access.value > NO_COMMANDS.value && !config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
-                Bukkit.getPluginManager().registerEvents(new SubSigns(this, new File(dir, "signs.dat")), this);
+                signs = new SubSigns(this, new File(dir, "signs.dat"));
                 CommandMap cmd = Util.reflect(Bukkit.getServer().getClass().getDeclaredField("commandMap"), Bukkit.getServer());
 
                 cmd.register("subservers", new SubCommand(this, "subservers"));
@@ -176,9 +177,9 @@ public final class SubPlugin extends JavaPlugin {
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;
             if (listeners.size() > 0) {
-                for (Object obj : listeners) {
+                for (Runnable listener : listeners) {
                     try {
-                        ((Runnable) obj).run();
+                        listener.run();
                     } catch (Throwable e) {
                         new InvocationTargetException(e, "Problem reloading plugin").printStackTrace();
                     }
@@ -206,10 +207,10 @@ public final class SubPlugin extends JavaPlugin {
                     } catch (IOException e) {
                         Bukkit.getLogger().info("SubData > Connection was unsuccessful, retrying in " + reconnect + " seconds");
 
-                        Bukkit.getScheduler().runTaskLater(SubPlugin.this, this, reconnect * 20);
+                        Bukkit.getScheduler().runTaskLater(SubPlugin.this, this, reconnect * 20L);
                     }
                 }
-            }, (disconnect == null)?0:reconnect * 20);
+            }, (disconnect == null)?0:reconnect * 20L);
         }
     }
 
@@ -230,7 +231,7 @@ public final class SubPlugin extends JavaPlugin {
             }
             subdata.clear();
             subdata.put(0, null);
-            SubSigns.save();
+            if (signs != null) signs.save();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

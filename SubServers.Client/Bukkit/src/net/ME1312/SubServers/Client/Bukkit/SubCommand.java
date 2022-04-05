@@ -63,7 +63,7 @@ public final class SubCommand extends Command {
             if (sender.hasPermission("subservers.command")) {
                 if (args.length > 0) {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
-                        sender.sendMessage(printHelp(sender, label));
+                        sender.sendMessage(printHelp(label));
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version").replace("$str$", "SubServers.Client.Bukkit"));
                         sender.sendMessage(ChatColor.WHITE + "  " + Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((Platform.getSystemBuild() != null)?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ChatColor.RESET + ',');
@@ -838,7 +838,7 @@ public final class SubCommand extends Command {
                     if (plugin.gui != null && sender instanceof Player && sender.hasPermission("subservers.interface")) {
                         plugin.gui.getRenderer((Player) sender).newUI();
                     } else {
-                        sender.sendMessage(printHelp(sender, label));
+                        sender.sendMessage(printHelp(label));
                     }
                 }
             } else if (args.length > 0 && (args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport"))) {
@@ -1118,7 +1118,7 @@ public final class SubCommand extends Command {
         }
     }
 
-    private String[] printHelp(CommandSender sender, String label) {
+    private String[] printHelp(String label) {
         return new String[]{
                 plugin.api.getLang("SubServers", "Command.Help.Header"),
                 plugin.api.getLang("SubServers", "Command.Help.Help").replace("$str$", label.toLowerCase() + " help"),

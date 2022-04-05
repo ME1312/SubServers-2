@@ -35,6 +35,12 @@
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubServers</groupId>
+            <artifactId>SubServers.Bungee.Common</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.SubServers</groupId>
             <artifactId>SubServers.Bungee</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>

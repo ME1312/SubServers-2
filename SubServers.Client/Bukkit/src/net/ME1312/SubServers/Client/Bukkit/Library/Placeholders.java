@@ -591,9 +591,9 @@ public final class Placeholders {
     }
 
     public final class Cache {
-        private Map<String, Proxy> proxies = Collections.emptyMap();
-        private Map<String, Host> hosts = Collections.emptyMap();
-        private Map<String, Server> servers = Collections.emptyMap();
+        private Map<String, Proxy> proxies = new TreeMap<>();
+        private Map<String, Host> hosts = new TreeMap<>();
+        private Map<String, Server> servers = new TreeMap<>();
         private Proxy master = null;
         private Listener events = new Events();
 

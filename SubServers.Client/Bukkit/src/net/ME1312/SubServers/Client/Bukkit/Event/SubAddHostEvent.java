@@ -22,6 +22,7 @@ public class SubAddHostEvent extends Event implements SubEvent {
      * @param host Host to be added
      */
     public SubAddHostEvent(UUID player, String host) {
+        super(true);
         Util.nullpo(host);
         this.player = player;
         this.host = host;

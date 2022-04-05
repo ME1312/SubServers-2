@@ -25,6 +25,7 @@ public class SubStopEvent extends Event implements SubEvent {
      * @param force If it was a Forced Shutdown
      */
     public SubStopEvent(UUID player, String server, boolean force) {
+        super(true);
         Util.nullpo(server, force);
         this.player = player;
         this.server = server;

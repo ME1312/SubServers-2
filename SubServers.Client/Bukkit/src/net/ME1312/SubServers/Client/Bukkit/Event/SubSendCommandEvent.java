@@ -26,6 +26,7 @@ public class SubSendCommandEvent extends Event implements SubEvent {
      * @param target Player that will send
      */
     public SubSendCommandEvent(UUID player, String server, String command, UUID target) {
+        super(true);
         Util.nullpo(server, command);
         this.player = player;
         this.server = server;

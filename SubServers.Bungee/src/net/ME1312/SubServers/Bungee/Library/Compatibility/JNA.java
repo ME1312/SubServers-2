@@ -4,12 +4,16 @@ package net.ME1312.SubServers.Bungee.Library.Compatibility;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import com.google.common.io.Resources;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 /**
  * JNA Library Loader Class
@@ -29,12 +33,13 @@ public class JNA {
     public static ClassLoader get() {
         if (JNA == null) {
             boolean announced = false;
+            Logger log = ProxyServer.getInstance().getLogger();
             File library = new File(SubAPI.getInstance().getInternals().dir, "SubServers/Cache/Libraries");
             File jna = new File(library, "jna-" + JNA_VERSION + ".jar");
             jna.getParentFile().mkdirs();
             if (!jna.exists()) {
                 announced = true;
-                System.out.println(">> Downloading JNA Library v" + JNA_VERSION);
+                log.info(">> Downloading JNA v" + JNA_VERSION);
                 try (FileOutputStream fin = new FileOutputStream(jna)) {
                     Resources.copy(new URL(JNA_DOWNLOAD.replace("$1", "jna")), fin);
                 } catch (Throwable e) {
@@ -45,7 +50,7 @@ public class JNA {
             File platform = new File(library, "jna-platform-" + JNA_VERSION + ".jar");
             platform.getParentFile().mkdirs();
             if (!platform.exists()) {
-                if (!announced) System.out.println(">> Downloading JNA Library v" + JNA_VERSION);
+                if (!announced) log.info(">> Downloading JNA platform v" + JNA_VERSION);
                 announced = true;
                 try (FileOutputStream fin = new FileOutputStream(platform)) {
                     Resources.copy(new URL(JNA_DOWNLOAD.replace("$1", "jna-platform")), fin);
@@ -55,16 +60,14 @@ public class JNA {
                 }
             }
             if (jna.exists() && platform.exists()) {
-                if (announced) System.out.println(">> Loading JNA Library");
+                if (announced) log.info(">> JNA download complete");
                 try {
                     JNA = new URLClassLoader(new URL[]{jna.toURI().toURL(), platform.toURI().toURL()});
                 } catch (Throwable e) {
-                    System.out.println(">> Could not load JNA Library:");
-                    e.printStackTrace();
+                    log.log(SEVERE, ">> Couldn't load JNA:", e);
                 }
             } else {
-                System.out.println(">> Could not load JNA Library:");
-                new FileNotFoundException().printStackTrace();
+                log.log(SEVERE, ">> Couldn't load JNA:", new FileNotFoundException());
             }
         }
         return JNA;

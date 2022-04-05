@@ -731,7 +731,14 @@ public final class SubProxy extends BungeeCommon implements Listener {
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
             setReconnectHandler(new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()))); // Re-initialize Smart Fallback
 
-        if (plugin != null) new Metrics(plugin, 1406).appendAppData();
+        if (plugin != null) Try.none.run(() -> new Metrics(plugin, 1406)
+                .addCustomChart(new Metrics.SingleLineChart("managed_hosts", () -> {
+                    return hosts.size();
+                })).addCustomChart(new Metrics.SingleLineChart("subdata_connected", () -> {
+                    final SubDataServer subdata = this.subdata;
+                    return (subdata != null)? subdata.getClients().size() : 0;
+                })).addCustomChart(Util.reflect(Metrics.class.getDeclaredField("PLAYER_VERSIONS"), null))
+        );
         new Timer("SubServers.Bungee::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
             @Override

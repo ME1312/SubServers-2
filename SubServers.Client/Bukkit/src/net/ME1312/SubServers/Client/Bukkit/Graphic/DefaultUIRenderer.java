@@ -102,7 +102,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void hostMenu(final int page) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title")));
-        plugin.api.getHosts(hosts -> plugin.api.getGroups(groups -> {
+        plugin.api.getHosts(hosts -> plugin.api.getGroups(groups -> Bukkit.getScheduler().runTask(plugin, () -> {
             setDownloading(null);
             lastVisitedObjects[0] = null;
             lastPage = page;
@@ -229,12 +229,12 @@ public class DefaultUIRenderer extends UIRenderer {
 
             Bukkit.getPlayer(player).openInventory(inv);
             open = true;
-        }));
+        })));
     }
 
     public void hostAdmin(final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").replace("$str$", name)));
-        plugin.api.getHost(name, host -> {
+        plugin.api.getHost(name, host -> Bukkit.getScheduler().runTask(plugin, () -> {
             windowHistory.add(() -> hostAdmin(name));
             if (host == null) {
                 if (hasHistory()) back();
@@ -342,7 +342,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 Bukkit.getPlayer(this.player).openInventory(inv);
                 open = true;
             }
-        });
+        }));
     }
 
     public void hostCreator(final CreatorOptions options) {
@@ -350,7 +350,7 @@ public class DefaultUIRenderer extends UIRenderer {
         if (!options.init()) windowHistory.add(() -> hostCreator(options));
         lastVisitedObjects[0] = options;
 
-        plugin.api.getHost(options.getHost(), host -> {
+        plugin.api.getHost(options.getHost(), host -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (host == null || !host.isAvailable() || !host.isEnabled()) {
                 lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
@@ -469,14 +469,14 @@ public class DefaultUIRenderer extends UIRenderer {
                 Bukkit.getPlayer(player).openInventory(inv);
                 open = true;
             }
-        });
+        }));
     }
 
     public void hostCreatorTemplates(final int page, final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").replace("$str$", options.getHost())));
         options.init();
         lastVisitedObjects[0] = options;
-        plugin.api.getHost(options.getHost(), host -> {
+        plugin.api.getHost(options.getHost(), host -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (host == null || !host.isAvailable() || !host.isEnabled()) {
                 lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
@@ -582,12 +582,12 @@ public class DefaultUIRenderer extends UIRenderer {
                 Bukkit.getPlayer(player).openInventory(inv);
                 open = true;
             }
-        });
+        }));
     }
 
     public void hostPlugin(final int page, final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", name)));
-        plugin.api.getHost(name, host -> {
+        plugin.api.getHost(name, host -> Bukkit.getScheduler().runTask(plugin, () -> {
             windowHistory.add(() -> hostPlugin(page, name));
             if (host == null) {
                 if (hasHistory()) back();
@@ -690,12 +690,12 @@ public class DefaultUIRenderer extends UIRenderer {
                 Bukkit.getPlayer(player).openInventory(inv);
                 open = true;
             }
-        });
+        }));
     }
 
     public void groupMenu(final int page) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title")));
-        plugin.api.getServers(servers -> {
+        plugin.api.getServers(servers -> Bukkit.getScheduler().runTask(plugin, () -> {
             setDownloading(null);
             lastVisitedObjects[0] = null;
             lastPage = page;
@@ -822,14 +822,14 @@ public class DefaultUIRenderer extends UIRenderer {
 
             Bukkit.getPlayer(player).openInventory(inv);
             open = true;
-        });
+        }));
     }
 
     public void serverMenu(final int page, final String host, final String group) {
         setDownloading(ChatColor.stripColor((host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):((group.length() == 0)?plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title-Ungrouped"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group))):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", host)));
         Value<String> hostname = new Container<String>(host);
         Value<List<Server>> servercontainer = new Container<List<Server>>(new LinkedList<Server>());
-        Runnable renderer = () -> {
+        Runnable renderer = () -> Bukkit.getScheduler().runTask(plugin, () -> {
             setDownloading(null);
             lastPage = page;
 
@@ -987,7 +987,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
             Bukkit.getPlayer(player).openInventory(inv);
             open = true;
-        };
+        });
 
         if (host != null && host.length() > 0) {
             plugin.api.getHost(host, object -> {
@@ -1018,7 +1018,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void serverAdmin(final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Title").replace("$str$", name)));
-        BiConsumer<Server, Host> renderer = (server, host) -> {
+        BiConsumer<Server, Host> renderer = (server, host) -> Bukkit.getScheduler().runTask(plugin, () -> {
             setDownloading(null);
             lastVisitedObjects[0] = server;
             ItemStack block;
@@ -1226,7 +1226,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
             player.openInventory(inv);
             open = true;
-        };
+        });
 
         plugin.api.getServer(name, server -> {
             windowHistory.add(() -> serverAdmin(name));
@@ -1250,7 +1250,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void serverPlugin(final int page, final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", name)));
-        plugin.api.getServer(name, server -> {
+        plugin.api.getServer(name, server -> Bukkit.getScheduler().runTask(plugin, () -> {
             windowHistory.add(() -> serverPlugin(page, name));
             if (server == null) {
                 if (hasHistory()) back();
@@ -1353,6 +1353,6 @@ public class DefaultUIRenderer extends UIRenderer {
                 Bukkit.getPlayer(player).openInventory(inv);
                 open = true;
             }
-        });
+        }));
     }
 }

@@ -23,6 +23,7 @@ public class SubStartEvent extends Event implements SubEvent {
      * @param server Server Starting
      */
     public SubStartEvent(UUID player, String server) {
+        super(true);
         Util.nullpo(server);
         this.player = player;
         this.server = server;

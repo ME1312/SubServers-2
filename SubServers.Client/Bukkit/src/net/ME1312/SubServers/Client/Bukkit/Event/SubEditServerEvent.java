@@ -28,6 +28,7 @@ public class SubEditServerEvent extends Event implements SubEvent {
      * @param edit Edit to make
      */
     public SubEditServerEvent(UUID player, String server, Pair<String, ?> edit) {
+        super(true);
         Util.nullpo(server, edit);
         ObjectMap<String> section = new ObjectMap<String>();
         section.set(".", edit.value());

@@ -23,6 +23,7 @@ public class SubRemoveServerEvent extends Event implements SubEvent {
      * @param server Server Starting
      */
     public SubRemoveServerEvent(UUID player, String host, String server) {
+        super(true);
         Util.nullpo(server);
         this.player = player;
         this.host = host;

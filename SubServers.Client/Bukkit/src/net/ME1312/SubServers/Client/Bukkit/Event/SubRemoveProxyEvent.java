@@ -18,6 +18,7 @@ public class SubRemoveProxyEvent extends Event implements SubEvent {
      * @param proxy Host Being Added
      */
     public SubRemoveProxyEvent(String proxy) {
+        super(true);
         Util.nullpo(proxy);
         this.proxy = proxy;
     }

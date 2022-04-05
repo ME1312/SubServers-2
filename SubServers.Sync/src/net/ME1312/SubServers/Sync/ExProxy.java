@@ -17,13 +17,13 @@ import net.ME1312.SubServers.Bungee.BungeeCommon;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.FallbackState;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
+import net.ME1312.SubServers.Bungee.Library.Metrics;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDisconnectPlayer;
 import net.ME1312.SubServers.Sync.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Sync.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Sync.Event.SubStartEvent;
 import net.ME1312.SubServers.Sync.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
-import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
@@ -267,7 +267,8 @@ public final class ExProxy extends BungeeCommon implements Listener {
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
             setReconnectHandler(new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()))); // Re-initialize Smart Fallback
 
-        if (plugin != null) new Metrics(plugin, 1461).appendAppData();
+
+        if (plugin != null) Try.none.run(() -> new Metrics(plugin, 1461).addCustomChart(Util.reflect(Metrics.class.getDeclaredField("PLAYER_VERSIONS"), null)));
         new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
             @Override

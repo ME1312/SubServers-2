@@ -115,9 +115,7 @@ public class SubProtocol extends SubDataProtocol {
         return instance;
     }
 
-    @SuppressWarnings("deprecation")
     private Logger getLogger(int channel) {
-        SubPlugin plugin = SubAPI.getInstance().getInternals();
         Logger log = Logger.getAnonymousLogger();
         log.setUseParentHandlers(false);
         log.addHandler(new Handler() {
@@ -127,11 +125,7 @@ public class SubProtocol extends SubDataProtocol {
             @Override
             public void publish(LogRecord record) {
                 if (open) {
-                    if (plugin.isEnabled()) {
-                        Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters()));
-                    } else {
-                        Bukkit.getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
-                    }
+                    Bukkit.getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
                 }
             }
 
@@ -193,7 +187,7 @@ public class SubProtocol extends SubDataProtocol {
     public SubDataClient open(Logger logger, InetAddress address, int port) throws IOException {
         SubPlugin plugin = SubAPI.getInstance().getInternals();
         return open(event -> {
-            if (plugin.isEnabled()) Bukkit.getScheduler().runTask(plugin, event);
+            if (plugin.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(plugin, event);
             else event.run();
         }, logger, address, port);
     }

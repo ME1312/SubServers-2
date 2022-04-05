@@ -230,7 +230,7 @@ public class ExProxy {
         if (config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Enabled", true))
             proxy.getEventManager().register(this, new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>())));
 
-        metrics.make(this, 11953).appendAppData();
+        Try.none.run(() -> metrics.make(this, 11953).addCustomChart(Util.reflect(Metrics.class.getDeclaredField("PLAYER_VERSIONS"), null)));
         new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
             @Override

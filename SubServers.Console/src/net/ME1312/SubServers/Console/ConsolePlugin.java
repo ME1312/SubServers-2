@@ -37,7 +37,7 @@ public final class ConsolePlugin extends Plugin implements Listener {
         getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "apopout"));
         getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "autopopout"));
 
-        new Metrics(this, 3853).appendPluginData();
+        new Metrics(this, 3853).addPlatformCharts();
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

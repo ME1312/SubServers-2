@@ -178,9 +178,9 @@ public final class SubPlugin {
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;
             if (listeners.size() > 0) {
-                for (Object obj : listeners) {
+                for (Runnable listener : listeners) {
                     try {
-                        ((Runnable) obj).run();
+                        listener.run();
                     } catch (Throwable e) {
                         new InvocationTargetException(e, "Problem reloading plugin").printStackTrace();
                     }

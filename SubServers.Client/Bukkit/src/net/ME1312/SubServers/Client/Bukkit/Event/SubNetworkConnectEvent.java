@@ -17,6 +17,7 @@ public class SubNetworkConnectEvent extends Event implements SubEvent {
      * SubData Network Connect Event
      */
     public SubNetworkConnectEvent(DataClient network) {
+        super(true);
         Util.nullpo(network);
         this.network = network;
     }
