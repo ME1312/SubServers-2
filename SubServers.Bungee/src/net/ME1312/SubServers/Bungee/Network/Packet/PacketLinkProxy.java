@@ -81,7 +81,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
                 queue(proxy.getName(), () -> client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, null)));
                 setReady(client);
             } else {
-                client.sendPacket(new PacketLinkProxy(proxy.getName(), 2, "Proxy already linked"));
+                client.sendPacket(new PacketLinkProxy(null, 2, "Proxy already linked: " + proxy.getName()));
 
             }
         } catch (Throwable e) {

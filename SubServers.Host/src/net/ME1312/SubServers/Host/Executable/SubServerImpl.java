@@ -98,6 +98,7 @@ public class SubServerImpl {
 
     private void run() {
         boolean falsestart = true;
+        int exit = Integer.MIN_VALUE;
         allowrestart = true;
         try {
             ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getString("Git-Bash"), executable)).directory(directory);
@@ -121,6 +122,7 @@ public class SubServerImpl {
             queue.clear();
 
             if (process.isAlive()) process.waitFor();
+            exit = process.exitValue();
         } catch (IOException | InterruptedException e) {
             host.log.error.println(e);
             allowrestart = false;
@@ -128,8 +130,8 @@ public class SubServerImpl {
         }
 
         logger.destroy();
-        if (SubAPI.getInstance().getSubDataNetwork()[0] != null) {
-            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExControlServer(this, Response.STOPPED, (Integer) process.exitValue(), (Boolean) allowrestart));
+        if (SubAPI.getInstance().getSubDataNetwork()[0] != null) { // noinspection UnnecessaryBoxing
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExControlServer(this, Response.STOPPED, Integer.valueOf(exit), Boolean.valueOf(allowrestart)));
         }
         host.log.info.println(name + " has stopped");
         process = null;

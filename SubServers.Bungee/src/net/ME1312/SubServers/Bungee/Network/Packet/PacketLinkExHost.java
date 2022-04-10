@@ -70,10 +70,10 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
                         queue(host.getName(), () -> client.sendPacket(new PacketLinkExHost(0, null)));
                         setReady(client);
                     } else {
-                        client.sendPacket(new PacketLinkExHost(3, "Host already linked"));
+                        client.sendPacket(new PacketLinkExHost(3, "Host already linked: " + data.getString(0x0000)));
                     }
                 } else {
-                    client.sendPacket(new PacketLinkExHost(4, "That host does not support a network interface"));
+                    client.sendPacket(new PacketLinkExHost(4, "Requested host does not support network interfaces: " + data.getString(0x0000)));
                 }
             } else {
                 client.sendPacket(new PacketLinkExHost(2, "There is no host with name: " + data.getString(0x0000)));

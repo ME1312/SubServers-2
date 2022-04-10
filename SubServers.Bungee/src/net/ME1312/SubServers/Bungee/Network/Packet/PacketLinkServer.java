@@ -176,7 +176,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
             last = now;
             setReady(client);
         } else {
-            client.sendPacket(new PacketLinkServer(null, 4, "Server already linked"));
+            client.sendPacket(new PacketLinkServer(null, 4, "Server already linked: " + server.getName()));
         }
     }
 }
