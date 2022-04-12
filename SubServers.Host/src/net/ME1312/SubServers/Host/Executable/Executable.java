@@ -110,7 +110,7 @@ public class Executable {
     private static boolean terminate9(Object handle) {
         try { // Attempt iteration over Java 9 ProcessHandle objects
             Class<?> clazz = handle.getClass();
-            Stream<?> children = (Stream<?>) clazz.getMethod("descendants").invoke(handle);
+            Stream<?> children = (Stream<?>) clazz.getMethod("children").invoke(handle);
             clazz.getMethod("destroyForcibly").invoke(handle);
             children.forEach(Executable::terminate9);
             return false;

@@ -195,13 +195,6 @@ public class SubProtocol extends SubDataProtocol {
         return subdata;
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public SubDataClient open(Logger logger, InetAddress address, int port) throws IOException {
-        SubPlugin plugin = SubAPI.getInstance().getInternals();
-        return open(event -> Sponge.getScheduler().createTaskBuilder().async().execute(event).submit(plugin), logger, address, port);
-    }
-
     public SubDataClient open(InetAddress address, int port) throws IOException {
         return open(getLogger(0), address, port);
     }
