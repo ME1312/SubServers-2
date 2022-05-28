@@ -26,8 +26,7 @@ public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjec
      * @param plugin SubPlugin
      */
     public PacketRestartServer(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

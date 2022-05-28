@@ -31,8 +31,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
      * @param plugin SubPlugin
      */
     public PacketLinkExHost(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

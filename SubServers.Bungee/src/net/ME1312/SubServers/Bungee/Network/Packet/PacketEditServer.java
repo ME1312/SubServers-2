@@ -27,8 +27,7 @@ public class PacketEditServer implements PacketObjectIn<Integer>, PacketObjectOu
      * @param plugin SubPlugin
      */
     public PacketEditServer(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

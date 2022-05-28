@@ -28,8 +28,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
      * @param plugin
      */
     public PacketOutExRunEvent(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

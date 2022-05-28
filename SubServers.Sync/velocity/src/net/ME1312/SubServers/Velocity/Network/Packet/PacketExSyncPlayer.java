@@ -30,8 +30,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
      * @param plugin SubPlugin
      */
     public PacketExSyncPlayer(ExProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

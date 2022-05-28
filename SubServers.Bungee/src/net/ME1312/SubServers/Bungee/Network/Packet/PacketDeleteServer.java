@@ -26,8 +26,7 @@ public class PacketDeleteServer implements PacketObjectIn<Integer>, PacketObject
      * @param plugin SubPlugin
      */
     public PacketDeleteServer(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

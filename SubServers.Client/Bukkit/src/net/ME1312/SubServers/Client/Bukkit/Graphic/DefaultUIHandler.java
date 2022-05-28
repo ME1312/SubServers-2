@@ -49,8 +49,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
      * @param plugin Event
      */
     public DefaultUIHandler(SubPlugin plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 

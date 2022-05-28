@@ -26,8 +26,7 @@ public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOu
      * @param plugin SubPlugin
      */
     public PacketStopServer(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

@@ -26,8 +26,7 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
      * @param plugin SubPlugin
      */
     public PacketDownloadServerInfo(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**
@@ -38,8 +37,7 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
      * @param tracker Receiver ID
      */
     public PacketDownloadServerInfo(SubProxy plugin, List<String> servers, UUID tracker) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
         this.tracker = tracker;
 
         if (servers != null) {

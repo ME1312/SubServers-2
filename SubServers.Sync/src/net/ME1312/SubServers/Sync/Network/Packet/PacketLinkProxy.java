@@ -23,8 +23,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
      * @param plugin SubServers.Client
      */
     public PacketLinkProxy(ExProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
     /**
      * New PacketLinkProxy (Out)
@@ -33,8 +32,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
      * @param channel Channel ID
      */
     public PacketLinkProxy(ExProxy plugin, int channel) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
         this.channel = channel;
     }
 

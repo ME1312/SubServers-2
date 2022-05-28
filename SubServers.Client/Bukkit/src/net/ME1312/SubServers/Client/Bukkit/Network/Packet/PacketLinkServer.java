@@ -24,8 +24,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
      * @param plugin SubServers.Client
      */
     public PacketLinkServer(SubPlugin plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
     /**
      * New PacketLinkServer (Out)
@@ -34,8 +33,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
      * @param channel Channel ID
      */
     public PacketLinkServer(SubPlugin plugin, int channel) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
         this.channel = channel;
     }
 

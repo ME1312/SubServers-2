@@ -236,12 +236,14 @@ public class HTMLogger extends AnsiOutputStream {
         } else if (color < 16) {
             return ANSI_BRIGHT_COLOR_MAP[color - 8];
         } else if (color < 232) {
-            int r = (int) (Math.floor((color - 16) / 36d) * (255 / 5));
-            int g = (int) (Math.floor(((color - 16) % 36d) / 6d) * (255 / 5));
-            int b = (int) (Math.floor(((color - 16) % 36d) % 6d) * (255 / 5));
+            float x = color - 16;
+            int r = (int) ((x / 36f) * 51);
+                  x =      (x % 36f)      ;
+            int g = (int) ((x /  6f) * 51);
+            int b = (int) ((x %  6f) * 51);
             return ((r >= 16)?"":"0") + Integer.toString(r, 16) + ((g >= 16)?"":"0") + Integer.toString(g, 16) + ((b >= 16)?"":"0") + Integer.toString(b, 16);
         } else if (color < 256) {
-            int gray = (int) ((255 / 25d) * (color - 232 + 1));
+            int gray = (int) (10.2f * (color - 231));
             return ((gray >= 16)?"":"0") + Integer.toString(gray, 16) + ((gray >= 16)?"":"0") + Integer.toString(gray, 16) + ((gray >= 16)?"":"0") + Integer.toString(gray, 16);
         } else {
             throw new IOException("Invalid 8 Bit Color: " + color);

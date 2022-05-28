@@ -26,8 +26,7 @@ public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjec
      * @param plugin SubPlugin
      */
     public PacketCommandServer(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

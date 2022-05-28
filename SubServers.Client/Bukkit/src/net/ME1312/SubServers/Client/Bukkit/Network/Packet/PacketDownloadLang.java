@@ -24,8 +24,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
      * @param plugin SubServers.Client
      */
     public PacketDownloadLang(SubPlugin plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

@@ -45,8 +45,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
      * @param plugin SubPlugin
      */
     public PacketLinkServer(SubProxy plugin) {
-        Util.nullpo(plugin);
-        this.plugin = plugin;
+        this.plugin = Util.nullpo(plugin);
     }
 
     /**

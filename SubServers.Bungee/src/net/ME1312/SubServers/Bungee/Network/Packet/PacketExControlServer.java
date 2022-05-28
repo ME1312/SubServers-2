@@ -72,7 +72,7 @@ public class PacketExControlServer implements PacketObjectIn<Integer>, PacketObj
         this.args = new Object[type.getArguments().length];
 
         for (int i = 0; i < type.getArguments().length; ++i) {
-            if (!type.getArguments()[i].isInstance(arguments[i])) throw new IllegalArgumentException("Argument " + (i+1) + " is not " + type.getArguments()[i].getCanonicalName());
+            if (!type.getArguments()[i].isInstance(arguments[i])) throw new IllegalArgumentException("Argument " + (i+1) + " is not " + type.getArguments()[i].getTypeName());
             args[i] = arguments[i];
         }
     }

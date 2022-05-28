@@ -235,7 +235,7 @@ public class SubLoggerImpl {
                 if (writer != null) {
                     PrintWriter writer = this.writer;
                     this.writer = null;
-                    int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
+                    int l = (("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2;
                     String s = "";
                     while (s.length() < l) s += '-';
                     if (writer != null) {
