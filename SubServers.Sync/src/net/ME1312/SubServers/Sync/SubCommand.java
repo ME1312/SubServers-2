@@ -38,6 +38,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -731,9 +732,12 @@ public final class SubCommand extends Command implements TabExecutor {
                 }
             }
         } else {
-            String str = label;
-            for (String arg : args) str += ' ' + arg;
-            ((ProxiedPlayer) sender).chat(str);
+            ProxiedPlayer player = (ProxiedPlayer) sender;
+            if (player.getPendingConnection().getVersion() < 759) { // player < 1.19
+                player.chat((args.length == 0)? label : label + ' ' + String.join(" ", args));
+            } else {
+                player.getServer().sendData("subservers:input", ((args.length == 0)? label : label + ' ' + String.join(" ", args)).getBytes(StandardCharsets.UTF_8));
+            }
         }
     }
 

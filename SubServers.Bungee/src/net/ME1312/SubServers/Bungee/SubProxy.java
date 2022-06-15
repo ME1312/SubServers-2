@@ -92,7 +92,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.18.2a");
+    public static final Version version = Version.fromString("2.19a");
 
     public final Proxy mProxy;
     public boolean canSudo = false;
@@ -724,6 +724,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         if (!config.get().getMap("Settings").getStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
             getPluginManager().registerCommand(plugin, new SubCommand.BungeeList(this, "glist"));
 
+        registerChannel("subservers:input");
         getPluginManager().registerCommand(plugin, new SubCommand(this, "subservers"));
         getPluginManager().registerCommand(plugin, new SubCommand(this, "subserver"));
         getPluginManager().registerCommand(plugin, new SubCommand(this, "sub"));

@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.messaging.Messenger;
 
 import java.io.*;
 import java.lang.invoke.MethodHandle;
@@ -33,6 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -96,7 +98,9 @@ public final class SubPlugin extends JavaPlugin {
                 Files.move(new File(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new File(dir, "subdata.rsa.key").toPath());
             }
 
-            getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+            Messenger pmc = getServer().getMessenger();
+            pmc.registerOutgoingPluginChannel(this, "BungeeCord");
+            pmc.registerIncomingPluginChannel(this, "subservers:input", (channel, player, bytes) -> player.chat(new String(bytes, StandardCharsets.UTF_8)));
             reload(false);
 
             subprotocol = SubProtocol.get();
@@ -232,6 +236,10 @@ public final class SubPlugin extends JavaPlugin {
             subdata.clear();
             subdata.put(0, null);
             if (signs != null) signs.save();
+
+            Messenger pmc = getServer().getMessenger();
+            pmc.unregisterOutgoingPluginChannel(this);
+            pmc.unregisterIncomingPluginChannel(this);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

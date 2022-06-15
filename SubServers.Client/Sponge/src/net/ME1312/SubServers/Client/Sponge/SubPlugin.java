@@ -27,6 +27,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.plugin.Plugin;
@@ -47,7 +48,7 @@ import static net.ME1312.SubServers.Client.Sponge.Library.AccessMode.NO_COMMANDS
 /**
  * SubServers Client Plugin Class
  */
-@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.18.2a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
+@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.19a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
 public final class SubPlugin {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     Pair<Long, Map<String, Map<String, String>>> lang = null;
@@ -66,14 +67,15 @@ public final class SubPlugin {
     @Inject public Game game;
 
     boolean running = false;
+    private boolean posted = false;
     private long resetDate = 0;
     private boolean reconnect = false;
 
     @Listener
-    public void setup(GamePreInitializationEvent event) {
+    public void enable(GamePreInitializationEvent event) {
         if (plugin.getVersion().isPresent()) {
             version = Version.fromString(plugin.getVersion().get());
-        } else version = new Version("Custom");
+        } else version = new Version("?");
         subdata.put(0, null);
     }
 
@@ -136,12 +138,23 @@ public final class SubPlugin {
             reconnect = true;
             log.info(" ");
             log.info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391"));
-            connect(null);
+            if (posted) connect(null);
 
             //gui = new InternalUIHandler(this);
             if (api.access.value > NO_COMMANDS.value && !config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
                 Sponge.getCommandManager().register(plugin, new SubCommand(this).spec(), "sub", "subserver", "subservers");
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Listener
+    @SuppressWarnings("unchecked")
+    public void enable(GameStartedServerEvent event) {
+        if (!posted) try {
+            posted = true;
+            connect(null);
 
             new Metrics(this);
             game.getScheduler().createTaskBuilder().async().execute(() -> {
@@ -166,8 +179,6 @@ public final class SubPlugin {
             e.printStackTrace();
         }
     }
-
-
 
     public void reload(boolean notifyPlugins) throws IOException {
         resetDate = Calendar.getInstance().getTime().getTime();

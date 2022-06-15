@@ -64,7 +64,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(id = "subservers-sync", name = "SubServers-Sync", authors = "ME1312", version = "2.18.2a", url = "https://github.com/ME1312/SubServers-2", description = "Dynamically sync player and server connection info over multiple proxy instances")
+@Plugin(id = "subservers-sync", name = "SubServers-Sync", authors = "ME1312", version = "2.19a", url = "https://github.com/ME1312/SubServers-2", description = "Dynamically sync player and server connection info over multiple proxy instances")
 public class ExProxy {
 
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
@@ -225,6 +225,7 @@ public class ExProxy {
         if (!config.get().getMap("Settings").getStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
             proxy.getCommandManager().register("glist", new SubCommand.BungeeList(this));
 
+        proxy.getChannelRegistrar().register(SubCommand.pmc);
         proxy.getCommandManager().register("subservers", new SubCommand(this), "subserver", "sub");
 
         if (config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Enabled", true))

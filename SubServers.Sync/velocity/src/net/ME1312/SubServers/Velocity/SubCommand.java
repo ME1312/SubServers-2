@@ -29,6 +29,7 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import net.kyori.adventure.text.Component;
@@ -42,6 +43,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -49,6 +51,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("deprecation")
 public final class SubCommand implements SimpleCommand {
+    static final MinecraftChannelIdentifier pmc = MinecraftChannelIdentifier.create("subservers", "input");
     static HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>> permitted = new HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>>();
     private Map<String, Proxy> proxyCache = Collections.emptyMap();
     private Map<String, Host> hostCache = Collections.emptyMap();
@@ -736,9 +739,12 @@ public final class SubCommand implements SimpleCommand {
                 }
             }
         } else {
-            String str = label;
-            for (String arg : args) str += ' ' + arg;
-            ((Player) sender).spoofChatInput(str);
+            Player player = (Player) sender;
+            if (player.getProtocolVersion().getProtocol() < 759) { // player < 1.19
+                player.spoofChatInput((args.length == 0)? label : label + ' ' + String.join(" ", args));
+            } else {
+                player.getCurrentServer().ifPresent(server -> server.sendPluginMessage(pmc, ((args.length == 0)? label : label + ' ' + String.join(" ", args)).getBytes(StandardCharsets.UTF_8)));
+            }
         }
     }
 
