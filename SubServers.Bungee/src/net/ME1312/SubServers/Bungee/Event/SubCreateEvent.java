@@ -36,7 +36,7 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
      * @param port Server Port Number
      */
     public SubCreateEvent(UUID player, Host host, String name, SubCreator.ServerTemplate template, Version version, int port) {
-        Util.nullpo(host, name, template, port);
+        Util.nullpo(host, name, template);
         this.player = player;
         this.host = host;
         this.name = name;

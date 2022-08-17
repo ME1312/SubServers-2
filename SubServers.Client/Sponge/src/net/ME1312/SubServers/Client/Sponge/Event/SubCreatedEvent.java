@@ -37,7 +37,7 @@ public class SubCreatedEvent extends AbstractEvent implements SubEvent {
      * @param port Server Port Number
      */
     public SubCreatedEvent(UUID player, String host, String name, String template, Version version, int port, boolean update, boolean success) {
-        Util.nullpo(host, name, template, port);
+        Util.nullpo(host, name, template);
         this.player = player;
         this.success = success;
         this.update = update;

@@ -51,7 +51,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
             @Override
             public void accept(ObjectMap<String> data) {
                 Sponge.getEventManager().post(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
-                        data.getString("template"), new Version(data.getString("version")), data.getInt("port"), data.getBoolean("update")));
+                        data.getString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update")));
                 callback("SubCreateEvent", this);
             }
         });
@@ -59,7 +59,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
             @Override
             public void accept(ObjectMap<String> data) {
                 Sponge.getEventManager().post(new SubCreatedEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
-                        data.getString("template"), new Version(data.getString("version")), data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
+                        data.getString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
                 callback("SubCreatedEvent", this);
             }
         });

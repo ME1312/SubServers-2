@@ -58,7 +58,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
             public void accept(ObjectMap<String> data) {
                 if (plugin.isEnabled()) {
                     Bukkit.getPluginManager().callEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
-                            data.getString("template"), (data.contains("version"))?new Version(data.getString("version")):null, data.getInt("port"), data.getBoolean("update")));
+                            data.getString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update")));
                     callback("SubCreateEvent", this);
                 }
             }
@@ -68,7 +68,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
             public void accept(ObjectMap<String> data) {
                 if (plugin.isEnabled()) {
                     Bukkit.getPluginManager().callEvent(new SubCreatedEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
-                            data.getString("template"), (data.contains("version"))?new Version(data.getString("version")):null, data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
+                            data.getString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
                     callback("SubCreatedEvent", this);
                 }
             }

@@ -37,7 +37,7 @@ public class SubCreateEvent extends Event implements SubEvent {
      */
     public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port, boolean update) {
         super(true);
-        Util.nullpo(host, name, template, port);
+        Util.nullpo(host, name, template);
         this.player = player;
         this.update = update;
         this.host = host;

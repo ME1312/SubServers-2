@@ -18,7 +18,7 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiBase</artifactId>
-            <version>22w16a</version>
+            <version>22w24a</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
