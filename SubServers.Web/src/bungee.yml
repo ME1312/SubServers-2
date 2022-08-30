@@ -1,0 +1,4 @@
+name: SubServers-Web
+main: net.ME1312.SubServers.Web.ConsolePlugin
+version: 2.18a
+author: ME1312
