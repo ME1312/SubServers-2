@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Web;
 
-import net.ME1312.SubServers.Web.endpoints.BlockingServlet;
+import net.ME1312.SubServers.Web.endpoints.StatusServlet;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -17,7 +17,7 @@ public class JettyServer {
 
 		ServletHandler handler = new ServletHandler();
 		server.setHandler(handler);
-		handler.addServletWithMapping(BlockingServlet.class, "/status");
+		handler.addServletWithMapping(StatusServlet.class, "/status");
 		server.start();
 	}
 }

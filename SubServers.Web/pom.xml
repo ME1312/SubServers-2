@@ -42,12 +42,17 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.3.v20170317</version>
+            <version>11.0.11</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.3.v20170317</version>
+            <version>11.0.11</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.9.1</version>
         </dependency>
     </dependencies>
 
@@ -112,7 +117,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2-beta-5</version>
                 <configuration>
-                    <finalName>SubServers.Console</finalName>
+                    <finalName>SubServers.Web</finalName>
                     <outputDirectory>../Artifacts/Plugins</outputDirectory>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
