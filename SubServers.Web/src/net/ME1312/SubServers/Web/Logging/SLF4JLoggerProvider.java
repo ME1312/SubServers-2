@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Web.Logging;
 
-import net.ME1312.SubServers.Web.SubAPI;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;
 import org.slf4j.spi.MDCAdapter;
