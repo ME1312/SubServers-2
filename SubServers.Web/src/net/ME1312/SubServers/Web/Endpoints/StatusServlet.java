@@ -1,4 +1,4 @@
-package net.ME1312.SubServers.Web.endpoints;
+package net.ME1312.SubServers.Web.Endpoints;
 
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServlet;

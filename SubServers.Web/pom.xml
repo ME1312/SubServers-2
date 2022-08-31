@@ -54,6 +54,24 @@
             <artifactId>gson</artifactId>
             <version>2.9.1</version>
         </dependency>
+        <dependency>
+            <groupId>net.ME1312.SubServers</groupId>
+            <artifactId>SubServers.Client.Common</artifactId>
+            <version>-PLACEHOLDER</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.Galaxi</groupId>
+            <artifactId>GalaxiAPI</artifactId>
+            <version>22w24a</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.SubServers</groupId>
+            <artifactId>SubServers.Host</artifactId>
+            <version>-PLACEHOLDER</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -73,7 +91,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
                 <configuration>
-                    <source>1.7</source> <!-- Source level 1.7 required by com.intellij.forms_rt -->
+                    <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
             </plugin>
