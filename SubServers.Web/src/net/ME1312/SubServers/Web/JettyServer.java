@@ -51,6 +51,7 @@ public class JettyServer {
 	public YAMLConfig config;
 	public ObjectMap<String> host = null;
 	public SubProtocol subprotocol;
+	public SubProxy proxy = null;
 
 	public final SubAPI api = new SubAPI(this);
 
@@ -62,6 +63,7 @@ public class JettyServer {
 		if (proxy == null){
 			isPlugin = false;
 		}
+		this.proxy = proxy;
 
 		log = new Logger("SubServers");
 		info = PluginInfo.load(this);
@@ -77,7 +79,6 @@ public class JettyServer {
 		engine.getPluginManager().loadPlugins(new File(engine.getRuntimeDirectory(), "Plugins"));
 
 		running = true;
-		this.isPlugin = isPlugin;
 		reload(false);
 
 		subdata.put(0, null);
@@ -134,32 +135,37 @@ public class JettyServer {
 	}
 
 	private void connect(final java.util.logging.Logger log, Pair<DisconnectReason, DataClient> disconnect) throws IOException {
-		if (!isPlugin) {
-			final int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
-			if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.key() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.key() != DisconnectReason.ENCRYPTION_MISMATCH)) {
-				final long reset = resetDate;
-				final Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");
-				if (disconnect != null) log.info("Attempting reconnect in " + reconnect + " seconds");
-				timer.scheduleAtFixedRate(new TimerTask() {
-					@Override
-					public void run() {
-						try {
-							if (reset == resetDate && (subdata.getOrDefault(0, null) == null || subdata.get(0).isClosed())) {
-								SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-										Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
-
-								if (subdata.getOrDefault(0, null) != null) subdata.get(0).reconnect(open);
-								subdata.put(0, open);
-							}
-							timer.cancel();
-						} catch (IOException e) {
-							log.info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
-						}
-					}
-				}, (disconnect == null) ? 0 : TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
-			}
+		int port = Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]);
+		String address = config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0];
+		if (isPlugin){
+			address = proxy.subdata.getSocket().getInetAddress().getHostName();
+			port = proxy.subdata.getSocket().getLocalPort();
 		}
-		//TODO: do stuff if we are a plugin
+
+		final int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
+		if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.key() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.key() != DisconnectReason.ENCRYPTION_MISMATCH)) {
+			final long reset = resetDate;
+			final Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");
+			if (disconnect != null) log.info("Attempting reconnect in " + reconnect + " seconds");
+			String finalAddress = address;
+			int finalPort = port;
+			timer.scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					try {
+						if (reset == resetDate && (subdata.getOrDefault(0, null) == null || subdata.get(0).isClosed())) {
+							SubDataClient open = subprotocol.open(InetAddress.getByName(finalAddress), finalPort);
+
+							if (subdata.getOrDefault(0, null) != null) subdata.get(0).reconnect(open);
+							subdata.put(0, open);
+						}
+						timer.cancel();
+					} catch (IOException e) {
+						log.info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
+					}
+				}
+			}, (disconnect == null) ? 0 : TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
+		}
 	}
 
 	public void stop() throws Exception {

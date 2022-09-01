@@ -69,7 +69,6 @@ public class ConfigUpdater {
 
             if (!isPlugin) {
                 YAMLSection subdata = new YAMLSection();
-                subdata.set("Name", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getString("Name", "undefined"));
                 subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getString("Address", "127.0.0.1:4391"));
                 if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getString("Password"));
                 if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Reconnect")) subdata.set("Reconnect", updated.getMap("Settings").getMap("SubData").getInt("Reconnect"));
