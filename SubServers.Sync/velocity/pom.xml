@@ -158,7 +158,7 @@
                             <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Sync.Velocity</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
-                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiBase/</link>
                                 <link>https://dev.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
                                 <link>https://jd.velocitypowered.com/3.0.0/</link>
                             </links>

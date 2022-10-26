@@ -125,7 +125,7 @@
                             <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Sponge</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
-                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiBase/</link>
                                 <link>https://dev.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
                                 <link>https://jd.spongepowered.org/spongeapi/7.3.0/</link>
                             </links>

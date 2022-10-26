@@ -155,7 +155,7 @@
                             <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Bukkit</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
-                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiBase/</link>
                                 <link>https://dev.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
                                 <link>https://hub.spigotmc.org/javadocs/spigot/</link>
                             </links>
