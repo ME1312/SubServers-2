@@ -413,6 +413,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Server-Admin.Plugins"))) {
                             player.closeInventory();
                             gui.serverPlugin(1, ((Server) gui.lastVisitedObjects[0]).getName());
+                        } else if (item.length() > 2 && item.substring(2).equals(((Server) gui.lastVisitedObjects[0]).getDisplayName()) &&
+                                !item.startsWith(ChatColor.RED.toString()) && !item.startsWith(ChatColor.YELLOW.toString()) && !((Server) gui.lastVisitedObjects[0]).getName().equals(plugin.api.getName())) {
+                            plugin.pmc(player, "Connect", ((Server) gui.lastVisitedObjects[0]).getName());
                         }
                     }
                 } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$")[0]) && // SubServer Plugin
