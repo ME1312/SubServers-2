@@ -557,7 +557,10 @@ public final class SubProxy extends BungeeCommon implements Listener {
         }
         ukeys.clear();
 
-        if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "SubServers.Bungee::System_Shutdown"));
+        if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            shutdown = true;
+            shutdown();
+        }, "SubServers.Bungee::System_Shutdown"));
         running = ready = true;
         legServers.clear();
 
