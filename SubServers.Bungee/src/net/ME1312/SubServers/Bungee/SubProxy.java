@@ -34,6 +34,7 @@ import net.ME1312.SubServers.Bungee.Network.SubProtocol;
 import com.dosse.upnp.UPnP;
 import com.google.common.collect.Range;
 import com.google.gson.Gson;
+import io.netty.channel.Channel;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -92,6 +93,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
+    public final Collection<Channel> listeners = super.listeners;
     public static final Version version = Version.fromString("2.19a");
 
     public final Proxy mProxy;
@@ -825,7 +827,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     }
 
     private boolean shutdown = false;
-    protected void shutdown() {
+    void shutdown() {
         if (ready) {
             legServers.clear();
             legServers.putAll(getServersCopy());
@@ -833,7 +835,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
             Logger.get("SubServers").info("Stopping hosted servers");
             String[] hosts = this.hosts.keySet().toArray(new String[0]);
-            if (shutdown || !super.isRunning) running = false;
+            if (shutdown) running = false;
             for (String host : hosts) {
                 api.forceRemoveHost(host);
             }

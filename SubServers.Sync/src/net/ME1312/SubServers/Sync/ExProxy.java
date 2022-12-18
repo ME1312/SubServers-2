@@ -32,6 +32,7 @@ import net.ME1312.SubServers.Sync.Server.SubServerImpl;
 
 import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
+import io.netty.channel.Channel;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
@@ -74,6 +75,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public final Plugin plugin;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
+    public final Collection<Channel> listeners = super.listeners;
     public static final Version version = Version.fromString("2.19a");
 
     public final boolean isPatched;

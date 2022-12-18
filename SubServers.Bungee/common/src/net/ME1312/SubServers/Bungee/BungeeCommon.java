@@ -1,9 +1,12 @@
 package net.ME1312.SubServers.Bungee;
 
+import net.ME1312.Galaxi.Library.Util;
+
+import io.netty.channel.Channel;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -13,8 +16,10 @@ import java.util.function.Supplier;
 public abstract class BungeeCommon extends BungeeCord {
     private static BungeeCommon instance;
     final Supplier<BungeeAPI> api;
+    protected final Collection<Channel> listeners;
 
-    protected BungeeCommon(Supplier<BungeeAPI> api) throws IOException {
+    protected BungeeCommon(Supplier<BungeeAPI> api) throws Exception {
+        listeners= Util.reflect(BungeeCord.class.getDeclaredField("listeners"), this);
         this.api = api;
         instance = this;
     }
