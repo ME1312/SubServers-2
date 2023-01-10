@@ -947,21 +947,26 @@ public final class SubProxy extends BungeeCommon implements Listener {
         }
     }
 
+    @SuppressWarnings({"AssignmentUsedAsCondition", "deprecation"})
     @EventHandler(priority = Byte.MIN_VALUE)
     public void ping_passthrough(ProxyPingEvent e) {
-        boolean dynamic;
-        ServerInfo override;
-        if ((dynamic = SmartFallback.getForcedHost(e.getConnection()) == null) && getReconnectHandler() instanceof SmartFallback && (override = SmartFallback.getDNS(e.getConnection())) != null) {
+        final boolean dynamic;
+        if ((dynamic = SmartFallback.getForcedHost(e.getConnection()) == null) || !e.getConnection().getListener().isPingPassthrough()) {
+            e.getResponse().getPlayers().setOnline(rPlayers.size());
+        }
+
+        final ServerInfo override;
+        if (dynamic && getReconnectHandler() instanceof SmartFallback && (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (!(override instanceof SubServer) || ((SubServer) override).isRunning()) {
                 if (!e.getConnection().getListener().isPingPassthrough()) {
-                    e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), e.getResponse().getFaviconObject()));
+                    e.getResponse().setDescription(override.getMotd());
                 } else {
-                    Container<Boolean> lock = new Container<>(true);
-                    boolean mode = plugin != null;
-                    if (mode) e.registerIntent(plugin);
+                    final boolean mode;
+                    final Container<Boolean> lock = new Container<>(true);
+                    if (mode = plugin != null) e.registerIntent(plugin);
                     ((BungeeServerInfo) override).ping((ping, error) -> {
                         if (error != null) {
-                            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), e.getResponse().getFaviconObject()));
+                            e.getResponse().setDescription(getTranslation("ping_cannot_connect"));
                         } else e.setResponse(ping);
                         lock.value = false;
                         if (mode) e.completeIntent(plugin);
@@ -969,28 +974,26 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     if (!mode) while (lock.value) Try.all.run(() -> Thread.sleep(4));
                 }
             }
-        } else if (dynamic) {
-            e.getResponse().getPlayers().setOnline(rPlayers.size());
         }
     }
 
+    @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void ping(ProxyPingEvent e) {
         ServerInfo override;
-        if ((override = SmartFallback.getForcedHost(e.getConnection())) != null || (override = SmartFallback.getDNS(e.getConnection())) != null) {
+        if ((override = SmartFallback.getForcedHost(e.getConnection())) != null || (getReconnectHandler() instanceof SmartFallback && (override = SmartFallback.getDNS(e.getConnection())) != null)) {
             if (override instanceof SubServer && !((SubServer) override).isRunning()) {
-                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), e.getResponse().getFaviconObject()));
+                e.getResponse().setDescription(api.getLang("SubServers", "Bungee.Ping.Offline"));
             }
         } else {
             int offline = 0;
             for (String name : e.getConnection().getListener().getServerPriority()) {
-                ServerInfo server = api.getServer(name.toLowerCase());
-                if (server == null) server = getServerInfo(name);
-                if (server == null || (server instanceof SubServer && !((SubServer) server).isRunning())) offline++;
+                ServerInfo server = getServerInfo(name);
+                if (server instanceof SubServer && !((SubServer) server).isRunning()) ++offline;
             }
 
             if (offline >= e.getConnection().getListener().getServerPriority().size()) {
-                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), e.getResponse().getFaviconObject()));
+                e.getResponse().setDescription(api.getLang("SubServers", "Bungee.Ping.Offline"));
             }
         }
     }

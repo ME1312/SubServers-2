@@ -20,7 +20,7 @@ import java.util.function.Consumer;
  * Run Event Packet
  */
 public class PacketInExRunEvent implements PacketObjectIn<Integer> {
-    private static HashMap<String, List<Consumer<ObjectMap<String>>>> callbacks = new HashMap<String, List<Consumer<ObjectMap<String>>>>();
+    private static final HashMap<String, List<Consumer<ObjectMap<String>>>> callbacks = new HashMap<String, List<Consumer<ObjectMap<String>>>>();
 
     /**
      * New PacketInRunEvent
@@ -131,9 +131,11 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
     @SuppressWarnings("unchecked")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        if (callbacks.containsKey(data.getString(0x0000))) {
-            for (Consumer<ObjectMap<String>> callback : PacketInExRunEvent.callbacks.remove(data.getString(0x0000))) {
-                callback.accept(new ObjectMap<>((Map<String, ?>) data.getObject(0x0001)));
+        synchronized (callbacks) {
+            if (callbacks.containsKey(data.getString(0x0000))) {
+                for (Consumer<ObjectMap<String>> callback : PacketInExRunEvent.callbacks.remove(data.getString(0x0000))) {
+                    callback.accept(new ObjectMap<>((Map<String, ?>) data.getObject(0x0001)));
+                }
             }
         }
     }

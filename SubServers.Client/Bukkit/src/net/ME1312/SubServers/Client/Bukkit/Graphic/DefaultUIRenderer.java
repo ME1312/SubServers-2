@@ -26,8 +26,8 @@ import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permi
  * Default GUI Renderer Class
  */
 public class DefaultUIRenderer extends UIRenderer {
-    private static int MAX_VISITED_OBJECTS = 2;
-    private List<Runnable> windowHistory = new LinkedList<Runnable>();
+    private static final int MAX_VISITED_OBJECTS = 2;
+    private final List<Runnable> windowHistory = new LinkedList<Runnable>();
     Object[] lastVisitedObjects = new Object[MAX_VISITED_OBJECTS];
     int lastPage = 1;
     Runnable lastMenu = null;
