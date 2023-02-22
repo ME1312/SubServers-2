@@ -74,9 +74,6 @@ public abstract class FileScanner {
                         literal = new StringBuilder();
                     }
                     switch (c) {
-                        case '\\':
-                            if (i.hasNext()) c = i.next();
-                            literal.appendCodePoint(c);
                         case '[':
                             for (boolean escaped = false; i.hasNext() && (c != ']' || escaped); c = i.next()) {
                                 if (c == '\\') escaped = !escaped;
@@ -95,6 +92,8 @@ public abstract class FileScanner {
                         case '?':
                             rule.append("[^/]");
                             break;
+                        case '\\':
+                            if (i.hasNext()) c = i.next();
                         default:
                             literal.appendCodePoint(c);
                             break;

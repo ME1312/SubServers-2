@@ -1,9 +1,9 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Merger;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
@@ -101,7 +101,7 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
             if (requests.size() == 0) {
                 callback.accept(failures.value);
             } else {
-                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                Merger merge = new Merger(() -> {
                     callback.accept(failures.value);
                 });
                 List<String> legacy, raw;

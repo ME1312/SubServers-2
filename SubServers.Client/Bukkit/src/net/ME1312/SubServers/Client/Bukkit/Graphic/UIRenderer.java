@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
-import net.ME1312.Galaxi.Library.Access;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Try;
@@ -18,6 +17,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.PrimitiveIterator.OfInt;
 import java.util.regex.Matcher;
@@ -55,7 +56,7 @@ public abstract class UIRenderer {
         if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
             MAPI_1_13 = null;
         } else {
-            MAPI_1_13 = Try.all.get(Access.shared.type(Material.class).method("getMaterial").parameters(String.class, boolean.class).returns(Material.class)::handle);
+            MAPI_1_13 = Try.all.get(() -> MethodHandles.publicLookup().findStatic(Material.class, "getMaterial", MethodType.methodType(Material.class, new Class[]{ String.class, boolean.class})));
         }
 
         // Detect Title API

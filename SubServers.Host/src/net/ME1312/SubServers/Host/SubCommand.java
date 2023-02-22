@@ -6,11 +6,11 @@ import net.ME1312.Galaxi.Command.CommandSender;
 import net.ME1312.Galaxi.Command.CompletionHandler;
 import net.ME1312.Galaxi.Engine.CommandParser;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
-import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Merger;
 import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -458,7 +458,7 @@ public class SubCommand {
                             if (select.subservers.length > 0) {
                                 Container<Integer> success = new Container<Integer>(0);
                                 Container<Integer> running = new Container<Integer>(0);
-                                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                Merger merge = new Merger(() -> {
                                     if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already running");
                                     if (success.value > 0) sender.sendMessage("Started " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
@@ -573,7 +573,7 @@ public class SubCommand {
 
                                 // Step 1-3: Restart Servers / Receive command Responses
                                 Container<Integer> success = new Container<Integer>(0);
-                                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                Merger merge = new Merger(() -> {
                                     if (success.value > 0) sender.sendMessage("Restarting " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
                                 for (SubServer server : select.subservers) {
@@ -617,7 +617,7 @@ public class SubCommand {
                             if (select.subservers.length > 0) {
                                 Container<Integer> success = new Container<Integer>(0);
                                 Container<Integer> running = new Container<Integer>(0);
-                                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                Merger merge = new Merger(() -> {
                                     if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline");
                                     if (success.value > 0) sender.sendMessage("Stopping " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
@@ -661,7 +661,7 @@ public class SubCommand {
                             if (select.subservers.length > 0) {
                                 Container<Integer> success = new Container<Integer>(0);
                                 Container<Integer> running = new Container<Integer>(0);
-                                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                Merger merge = new Merger(() -> {
                                     if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline");
                                     if (success.value > 0) sender.sendMessage("Terminated " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
@@ -715,7 +715,7 @@ public class SubCommand {
 
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (running.value > 0) sender.sendMessage(running.value + " server"+((running.value == 1)?" was":"s were") + " offline");
                                         if (success.value > 0) sender.sendMessage("Sent command to " + success.value + " server"+((success.value == 1)?"":"s"));
                                     });
@@ -850,7 +850,7 @@ public class SubCommand {
                                 boolean ts = template == null;
 
                                 Container<Integer> success = new Container<Integer>(0);
-                                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                Merger merge = new Merger(() -> {
                                     if (success.value > 0) sender.sendMessage("Updating " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
                                 for (SubServer server : select.subservers) {
@@ -934,7 +934,7 @@ public class SubCommand {
                         selectServers(sender, args, 0, true, select -> {
                             if (select.subservers.length > 0) {
                                 Container<Integer> success = new Container<Integer>(0);
-                                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                Merger merge = new Merger(() -> {
                                     if (success.value > 0) sender.sendMessage("Removing " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
                                 for (SubServer server : select.subservers) {
@@ -1037,7 +1037,7 @@ public class SubCommand {
         };
 
         // Step 2
-        AsyncConsolidator merge = new AsyncConsolidator(finished);
+        Merger merge = new Merger(finished);
         for (boolean run = true; run && ic.value() < rargs.length; ic.value(ic.value() + 1)) {
             String current = rargs[ic.value()];
             last.value(current);

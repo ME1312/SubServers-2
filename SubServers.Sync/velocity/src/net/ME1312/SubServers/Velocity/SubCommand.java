@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Velocity;
 
-import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Merger;
 import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
@@ -352,7 +352,7 @@ public final class SubCommand implements SimpleCommand {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (running.value > 0) sender.sendMessage(Component.text("SubServers > " + running.value + " subserver"+((running.value == 1)?" was":"s were") + " already running"));
                                         if (success.value > 0) sender.sendMessage(Component.text("SubServers > Started " + success.value + " subserver"+((success.value == 1)?"":"s")));
                                     });
@@ -455,7 +455,7 @@ public final class SubCommand implements SimpleCommand {
 
                                     // Step 1-3: Restart Servers / Receive command Responses
                                     Container<Integer> success = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (success.value > 0) sender.sendMessage(Component.text("SubServers > Restarting " + success.value + " subserver"+((success.value == 1)?"":"s")));
                                     });
                                     for (SubServer server : select.subservers) {
@@ -488,7 +488,7 @@ public final class SubCommand implements SimpleCommand {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (running.value > 0) sender.sendMessage(Component.text("SubServers > " + running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline"));
                                         if (success.value > 0) sender.sendMessage(Component.text("SubServers > Stopping " + success.value + " subserver"+((success.value == 1)?"":"s")));
                                     });
@@ -521,7 +521,7 @@ public final class SubCommand implements SimpleCommand {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (running.value > 0) sender.sendMessage(Component.text("SubServers > " + running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline"));
                                         if (success.value > 0) sender.sendMessage(Component.text("SubServers > Terminated " + success.value + " subserver"+((success.value == 1)?"":"s")));
                                     });
@@ -561,7 +561,7 @@ public final class SubCommand implements SimpleCommand {
 
                                         Container<Integer> success = new Container<Integer>(0);
                                         Container<Integer> running = new Container<Integer>(0);
-                                        AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        Merger merge = new Merger(() -> {
                                             if (running.value > 0) sender.sendMessage(Component.text("SubServers > " + running.value + " server"+((running.value == 1)?" was":"s were") + " offline"));
                                             if (success.value > 0) sender.sendMessage(Component.text("SubServers > Sent command to " + success.value + " server"+((success.value == 1)?"":"s")));
                                         });
@@ -641,7 +641,7 @@ public final class SubCommand implements SimpleCommand {
                                     boolean ts = template == null;
 
                                     Container<Integer> success = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (success.value > 0) sender.sendMessage(Component.text("SubServers > Updating " + success.value + " subserver"+((success.value == 1)?"":"s")));
                                     });
                                     for (SubServer server : select.subservers) {
@@ -696,7 +696,7 @@ public final class SubCommand implements SimpleCommand {
                             selectServers(sender, args, 1, true, select -> {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (success.value > 0) sender.sendMessage(Component.text("SubServers > Removing " + success.value + " subserver"+((success.value == 1)?"":"s")));
                                     });
                                     for (SubServer server : select.subservers) {
@@ -801,7 +801,7 @@ public final class SubCommand implements SimpleCommand {
         };
 
         // Step 2
-        AsyncConsolidator merge = new AsyncConsolidator(finished);
+        Merger merge = new Merger(finished);
         for (boolean run = true; run && ic.value() < rargs.length; ic.value(ic.value() + 1)) {
             String current = rargs[ic.value()];
             last.value(current);

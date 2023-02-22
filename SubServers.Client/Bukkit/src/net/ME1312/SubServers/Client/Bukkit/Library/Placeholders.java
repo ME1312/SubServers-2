@@ -1,11 +1,10 @@
 package net.ME1312.SubServers.Client.Bukkit.Library;
 
-import net.ME1312.Galaxi.Library.Access;
-import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Merger;
 import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Event.*;
@@ -22,6 +21,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
@@ -53,7 +54,7 @@ public final class Placeholders {
     public void start() {
         if (!init) {
             init = true;
-            papi = Try.all.get(() -> Access.shared.type(Class.forName("me.clip.placeholderapi.PlaceholderAPI")).method(String.class, "setPlaceholders").parameters(OfflinePlayer.class, String.class).handle());
+            papi = Try.all.get(() -> MethodHandles.publicLookup().findStatic(Class.forName("me.clip.placeholderapi.PlaceholderAPI"), "setPlaceholders", MethodType.methodType(String.class, new Class[]{ OfflinePlayer.class, String.class })));
             Bukkit.getPluginManager().registerEvents(cache.events, plugin);
             Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
                 if (task == null) {
@@ -607,7 +608,7 @@ public final class Placeholders {
         private void refresh(Runnable callback) {
             if (SubAPI.getInstance().getSubDataNetwork()[0] != null) {
                 Container<Boolean> order = new Container<>(null);
-                AsyncConsolidator async = new AsyncConsolidator(() -> {
+                Merger async = new Merger(() -> {
                     try {
                         Map<String, SubServer> servers;
                         for (Host host : hosts.values()) {

@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import net.ME1312.Galaxi.Library.Access;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Pair;
@@ -30,6 +29,8 @@ import org.bukkit.plugin.messaging.Messenger;
 
 import java.io.*;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -68,7 +69,7 @@ public final class SubPlugin extends JavaPlugin {
     public SubPlugin() throws Throwable {
         super();
         Class<?> gson = Class.forName(((Try.all.get(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
-        this.gson = Access.shared.type(gson).method("fromJson").instance(gson.newInstance()).parameters(String.class, Class.class).returns(Object.class).handle();
+        this.gson = MethodHandles.publicLookup().findVirtual(gson, "fromJson", MethodType.methodType(Object.class, new Class[]{ String.class, Class.class })).bindTo(gson.newInstance());
         version = Version.fromString(getDescription().getVersion());
         subdata.put(0, null);
     }

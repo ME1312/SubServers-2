@@ -1,12 +1,12 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Merger;
 import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
@@ -350,7 +350,7 @@ public final class SubCommand extends Command {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Running").replace("$int$", running.value.toString()));
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start").replace("$int$", success.value.toString()));
                                     });
@@ -448,7 +448,7 @@ public final class SubCommand extends Command {
 
                                     // Step 3: Receive command Responses
                                     Container<Integer> success = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart").replace("$int$", success.value.toString()));
                                     });
                                     Consumer<Pair<Integer, SubServer>> stopper = data -> {
@@ -501,7 +501,7 @@ public final class SubCommand extends Command {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop.Not-Running").replace("$int$", running.value.toString()));
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop").replace("$int$", success.value.toString()));
                                     });
@@ -548,7 +548,7 @@ public final class SubCommand extends Command {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate.Not-Running").replace("$int$", running.value.toString()));
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate").replace("$int$", success.value.toString()));
                                     });
@@ -602,7 +602,7 @@ public final class SubCommand extends Command {
 
                                         Container<Integer> success = new Container<Integer>(0);
                                         Container<Integer> running = new Container<Integer>(0);
-                                        AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        Merger merge = new Merger(() -> {
                                             if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command.Not-Running").replace("$int$", running.value.toString()));
                                             if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command").replace("$int$", success.value.toString()));
                                         });
@@ -686,7 +686,7 @@ public final class SubCommand extends Command {
                                     boolean ts = template == null;
 
                                     Container<Integer> success = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update").replace("$int$", success.value.toString()));
                                     });
                                     for (SubServer server : select.subservers) {
@@ -741,7 +741,7 @@ public final class SubCommand extends Command {
                             selectServers(sender, args, 1, true, "subservers.subserver.%.delete", select -> {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
-                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    Merger merge = new Merger(() -> {
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Delete").replace("$int$", success.value.toString()));
                                     });
                                     for (SubServer server : select.subservers) {
@@ -964,7 +964,7 @@ public final class SubCommand extends Command {
         };
 
         // Step 2
-        AsyncConsolidator merge = new AsyncConsolidator(finished);
+        Merger merge = new Merger(finished);
         for (boolean run = true; run && ic.value() < rargs.length; ic.value(ic.value() + 1)) {
             String current = rargs[ic.value()];
             last.value(current);
@@ -1025,7 +1025,7 @@ public final class SubCommand extends Command {
 
                     if (current.equals(".")) {
                         plugin.api.getSubServer(plugin.api.getName(), self -> {
-                            AsyncConsolidator merge2 = new AsyncConsolidator(merge::release);
+                            Merger merge2 = new Merger(merge::release);
                             for (String name : self.getGroups()) {
                                 merge2.reserve();
                                 plugin.api.getGroup(name, group -> {
