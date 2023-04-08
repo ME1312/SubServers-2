@@ -120,6 +120,7 @@ public class ExternalHost extends Host implements ClientHandler {
             if (!served.contains(server.getName())) {
                 client.sendPacket(new PacketExAddServer((ExternalSubServer) server, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
                     if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
+                    else if (server.isRunning()) ((ExternalSubServer) server).stopped(false);
                 }));
             }
         }

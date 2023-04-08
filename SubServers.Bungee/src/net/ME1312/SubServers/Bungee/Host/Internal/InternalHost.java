@@ -15,6 +15,7 @@ import net.ME1312.SubServers.Bungee.SubProxy;
 
 import com.dosse.upnp.UPnP;
 import com.google.common.collect.Range;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -185,7 +186,7 @@ public class InternalHost extends Host {
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"), false);
-                    writer.write(info.toJSON().toString());
+                    writer.write(new Gson().toJson(info.get()));
                     writer.close();
                 } catch (Exception e) {
                     e.printStackTrace();

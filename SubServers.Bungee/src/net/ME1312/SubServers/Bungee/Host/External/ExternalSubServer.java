@@ -158,7 +158,7 @@ public class ExternalSubServer extends SubServerImpl {
             } else return false;
         } else return false;
     }
-    private void stopped(Boolean allowrestart) {
+    void stopped(Boolean allowrestart) {
         logger.stop();
         history.clear();
         started = false;

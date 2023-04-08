@@ -18,7 +18,7 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiBase</artifactId>
-            <version>23w08b</version>
+            <version>23w14a</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -84,9 +84,11 @@
                 <configuration>
                     <finalName>SubServers.Client.Common</finalName>
                     <outputDirectory>../../Artifacts/Modulized</outputDirectory>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <descriptor>jar-with-some-dependencies.xml</descriptor>
+                    </descriptors>
+                    <descriptor>
+                    </descriptor>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>

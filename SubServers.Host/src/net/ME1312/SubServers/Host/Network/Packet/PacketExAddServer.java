@@ -40,16 +40,6 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
      * @param response Response ID
      * @param tracker Receiver ID
      */
-    public PacketExAddServer(int response, UUID tracker) {
-        this(response, null, tracker);
-    }
-
-    /**
-     * New PacketExAddServer (Out)
-     *
-     * @param response Response ID
-     * @param tracker Receiver ID
-     */
     public PacketExAddServer(int response, UUID running, UUID tracker) {
         Util.nullpo(response);
         this.response = response;
@@ -102,16 +92,16 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
                 init(client.getConnection(), new SubServerImpl(host, name, enabled, port, log, dir, exec, stopcmd), running, tracker, logger);
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketExAddServer(2, tracker));
+            client.sendPacket(new PacketExAddServer(2, null, tracker));
             host.log.error.println(e);
         }
     }
 
     private void init(SubDataClient client, SubServerImpl server, UUID running, UUID tracker, Logger logger) {
+        client.sendPacket(new PacketExAddServer(0, running, tracker));
         host.servers.put(server.getName().toLowerCase(), server);
         if (UPnP.isUPnPAvailable() && host.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getPort());
         logger.info("Added SubServer: " + server.getName());
         if (running != null) server.start(running);
-        client.sendPacket(new PacketExAddServer(0, tracker));
     }
 }

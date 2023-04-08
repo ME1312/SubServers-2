@@ -606,7 +606,7 @@ public class InternalSubCreator extends SubCreator {
             YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new File(dir, "subdata.json"), false);
             config.setAll(getSubData());
-            writer.write(config.toJSON().toString());
+            writer.write(new Gson().toJson(config.get()));
             writer.close();
 
             if (!new File(dir, "subdata.rsa.key").exists() && new File("SubServers/subdata.rsa.key").exists()) {

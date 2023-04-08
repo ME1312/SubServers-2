@@ -17,8 +17,8 @@
     <dependencies>
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
-            <artifactId>jansi</artifactId> <!--suppress MavenPackageUpdate-->
-            <version>1.18</version>
+            <artifactId>jansi</artifactId>
+            <version>2.4.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -30,13 +30,13 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>23w08b</version>
+            <version>23w14a</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUI</artifactId>
-            <version>23w08b</version>
+            <version>23w14a</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>

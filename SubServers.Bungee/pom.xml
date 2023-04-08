@@ -126,9 +126,9 @@
                     <archive>
                         <manifestFile>src/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <descriptor>../SubServers.Client/Common/jar-with-some-dependencies.xml</descriptor>
+                    </descriptors>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
