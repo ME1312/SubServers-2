@@ -8,7 +8,7 @@
     <dependencySets>
         <dependencySet>
             <outputDirectory>/</outputDirectory>
-            <useProjectArtifact>true</useProjectArtifact>
+            <useProjectArtifact>false</useProjectArtifact>
             <unpack>true</unpack>
             <scope>runtime</scope>
             <excludes>
@@ -20,10 +20,14 @@
     <fileSets>
         <fileSet>
             <outputDirectory>/</outputDirectory>
+            <directory>${project.build.outputDirectory}</directory>
+            <excludes>
+                <exclude>net/ME1312/SubServers/Client/Bukkit/Library/Compatibility/AgnosticScheduler.class</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/</outputDirectory>
             <directory>../../out/compile/target/SubServers.Client.Folia/classes</directory>
-            <includes>
-                <include>**</include>
-            </includes>
         </fileSet>
     </fileSets>
 </assembly>

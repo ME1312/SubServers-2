@@ -189,14 +189,14 @@ public abstract class AgnosticScheduler {
             }
             @Override
             public Runnable repeats(Plugin plugin, Consumer<Runnable> task, long repeat) {
-                final long rMS;
-                return repeats(plugin, task, rMS = repeat * 50, repeat, rMS, repeat);
+                final long ms;
+                return repeats(plugin, task, ms = repeat * 50, repeat, ms, repeat);
             }
 
             @Override
             public Runnable repeats(Plugin plugin, Consumer<Runnable> task, long repeat, TimeUnit units) {
-                final long rT;
-                return repeats(plugin, task, repeat = units.toMillis(repeat), rT = repeat / 50, repeat, rT);
+                final long ticks;
+                return repeats(plugin, task, repeat = units.toMillis(repeat), ticks = repeat / 50, repeat, ticks);
             }
 
             @Override

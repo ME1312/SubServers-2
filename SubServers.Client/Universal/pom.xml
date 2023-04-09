@@ -45,7 +45,7 @@
                         <manifestFile>MANIFEST.MF</manifestFile>
                     </archive>
                     <descriptors>
-                        <descriptor>../Folia/jar-with-some-dependencies-plus-folia.xml</descriptor>
+                        <descriptor>../Common/jar-with-some-dependencies.xml</descriptor>
                     </descriptors>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>

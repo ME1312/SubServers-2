@@ -1,7 +1,5 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Compatibility;
 
-import net.ME1312.Galaxi.Library.Try;
-
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -16,7 +14,6 @@ import java.util.function.Consumer;
  * Folia Regional Scheduling Compatibility Class
  */
 public abstract class AgnosticScheduler {
-    private static final boolean regional = Try.all.get(() -> Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler") != null);
 
     /**
      * Provides an asynchronous thread scheduler (in both folia and bukkit)

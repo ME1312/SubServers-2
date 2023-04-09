@@ -39,11 +39,13 @@ public abstract class UIRenderer {
 
     static final HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
     static final HashMap<String, PluginRenderer<Server>> serverPlugins = new HashMap<String, PluginRenderer<Server>>();
-    private ContainedPair<String, Integer> tdownload = null;
-    private final String[] adownload;
-    private Runnable download = null;
+    private final String[] downloadA;
+    private final int downloadL;
+    private int downloadF;
+    private String downloadT;
+    private Runnable download;
     final Player player;
-    SubPlugin plugin;
+    final SubPlugin plugin;
 
     /**
      * Creates a new UIRenderer
@@ -74,7 +76,7 @@ public abstract class UIRenderer {
             TAPI_1_11 = TAPI_PLUGIN = false;
         }
 
-        // Pre-render Animations
+        // Pre-render Animation
         {
             String a = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt");
             String b = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color");
@@ -108,7 +110,7 @@ public abstract class UIRenderer {
                     break;
                 }
             } while (true);
-            adownload = frames.toArray(new String[0]);
+            downloadL = (downloadA = frames.toArray(new String[0])).length;
         }
     }
 
@@ -246,7 +248,7 @@ public abstract class UIRenderer {
                     final String text = subtitle;
                     if (download != null) download.run();
                     download = AgnosticScheduler.following(player).runs(plugin, cancel -> {
-                        if (tdownload != null && player.isOnline()) player.sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", text));
+                        if (downloadT != null && player.isOnline()) player.sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", text));
                         download = null;
                     }, 2500, TimeUnit.MILLISECONDS);
                     return;
@@ -255,16 +257,17 @@ public abstract class UIRenderer {
                 if (!subtitle.startsWith(Character.toString(ChatColor.COLOR_CHAR))) {
                     subtitle = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + subtitle;
                 }
-                if (tdownload == null) {
-                    tdownload = new ContainedPair<String, Integer>(subtitle, 0);
+                if (downloadT == null) {
+                    downloadT = subtitle;
+                    downloadF = 0;
 
                     AgnosticScheduler.following(player).repeats(plugin, cancel -> {
-                        if (tdownload != null) {
-                            if (++tdownload.value >= adownload.length) {
-                                tdownload.value = 0;
+                        if (downloadT != null) {
+                            if (++downloadF >= downloadL) {
+                                downloadF = 0;
                             }
 
-                            if (!sendTitle(adownload[tdownload.value], tdownload.key, 0, 10, 5)) {
+                            if (!sendTitle(downloadA[downloadF], downloadT, 0, 10, 5)) {
                                 cancel.run();
                             }
                         } else {
@@ -273,11 +276,11 @@ public abstract class UIRenderer {
                         }
                     }, 0, 50, TimeUnit.MILLISECONDS);
                 } else {
-                    tdownload.key = subtitle;
+                    downloadT = subtitle;
                 }
             } else {
-                if (tdownload != null) {
-                    tdownload = null;
+                if (downloadT != null) {
+                    downloadT = null;
                 }
                 if (download != null) {
                     download.run();
