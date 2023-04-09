@@ -19,17 +19,17 @@ function __DL() {
     fi
 }
 function __Restore() {
-    if [[ -f "Forge.old.jar.x" ]]; then
+    if [[ -f "Forge.old.jar" ]]; then
         if [[ -f "Forge.jar" ]]; then
             rm -Rf Forge.jar
         fi
-        mv Forge.old.jar.x Forge.jar
+        mv Forge.old.jar Forge.jar
     fi
-    if [[ -f "mods/Sponge.old.jar.x" ]]; then
+    if [[ -f "mods/Sponge.old.jar" ]]; then
         if [[ -f "mods/Sponge.jar" ]]; then
             rm -Rf mods/Sponge.jar
         fi
-        mv mods/Sponge.old.jar.x mods/Sponge.jar
+        mv mods/Sponge.old.jar mods/Sponge.jar
     fi
 }
 echo Downloading the Minecraft Forge Installer...
@@ -60,10 +60,10 @@ if [[ $__RETURN -eq 0 ]]; then
                 mv -f "forge-$mcf_version-universal.jar" Forge.jar
                 echo Downloading SpongeForge...
                 if [[ -f "mods/Sponge.jar" ]]; then
-                    if [[ -f "mods/Sponge.old.jar.x" ]]; then
-                        rm -Rf mods/Sponge.old.jar.x
+                    if [[ -f "mods/Sponge.old.jar" ]]; then
+                        rm -Rf mods/Sponge.old.jar
                     fi
-                    mv mods/Sponge.jar mods/Sponge.old.jar.x
+                    mv mods/Sponge.jar mods/Sponge.old.jar
                 fi
                 __DL mods/Sponge.jar "https://repo.spongepowered.org/maven/org/spongepowered/spongeforge/$sp_version/spongeforge-$sp_version.jar"; __RETURN=$?
                 if [[ $__RETURN -eq 0 ]]; then

@@ -15,10 +15,11 @@ import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.PlaceholderImpl;
-import net.ME1312.SubServers.Client.Bukkit.Library.Placeholders;
 import net.ME1312.SubServers.Client.Bukkit.Library.ConfigUpdater;
 import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
+import net.ME1312.SubServers.Client.Bukkit.Library.Placeholders;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubProtocol;
 
 import org.bukkit.Bukkit;
@@ -150,7 +151,7 @@ public final class SubPlugin extends JavaPlugin {
             }
 
             new Metrics(this, 2334);
-            Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            AgnosticScheduler.async.repeats(this, c -> {
                 try {
                     YAMLSection tags = new YAMLSection(parseJSON("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
                     List<Version> versions = new LinkedList<Version>();
@@ -198,24 +199,22 @@ public final class SubPlugin extends JavaPlugin {
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.key() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.key() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             if (disconnect != null) Bukkit.getLogger().info("SubData > Attempting reconnect in " + reconnect + " seconds");
-            Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (reset == resetDate && (subdata.getOrDefault(0, null) == null || subdata.get(0).isClosed())) {
-                            SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
 
-                            if (subdata.getOrDefault(0, null) != null) subdata.get(0).reconnect(open);
-                            subdata.put(0, open);
-                        }
-                    } catch (IOException e) {
-                        Bukkit.getLogger().info("SubData > Connection was unsuccessful, retrying in " + reconnect + " seconds");
 
-                        Bukkit.getScheduler().runTaskLater(SubPlugin.this, this, reconnect * 20L);
+            AgnosticScheduler.async.repeats(this, cancel -> {
+                try {
+                    if (reset == resetDate && (subdata.getOrDefault(0, null) == null || subdata.get(0).isClosed())) {
+                        SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
+
+                        if (subdata.getOrDefault(0, null) != null) subdata.get(0).reconnect(open);
+                        subdata.put(0, open);
+                        cancel.run();
                     }
+                } catch (IOException e) {
+                    Bukkit.getLogger().info("SubData > Connection was unsuccessful, retrying in " + reconnect + " seconds");
                 }
-            }, (disconnect == null)?0:reconnect * 20L);
+            }, (disconnect == null)?0:reconnect, reconnect, TimeUnit.SECONDS);
         }
     }
 

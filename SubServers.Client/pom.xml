@@ -9,6 +9,7 @@
 
     <modules>
         <module>Common</module>
+        <module>Folia</module>
         <module>Bukkit</module>
         <module>Sponge</module>
         <module>Universal</module>

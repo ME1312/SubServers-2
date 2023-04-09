@@ -5,6 +5,7 @@ import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
 import net.ME1312.SubServers.Client.Common.Network.API.Server;
@@ -14,13 +15,16 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.PrimitiveIterator.OfInt;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,9 +41,9 @@ public abstract class UIRenderer {
     static final HashMap<String, PluginRenderer<Server>> serverPlugins = new HashMap<String, PluginRenderer<Server>>();
     private ContainedPair<String, Integer> tdownload = null;
     private final String[] adownload;
-    private int download = -1;
-    private final UUID player;
-    private SubPlugin plugin;
+    private Runnable download = null;
+    final Player player;
+    SubPlugin plugin;
 
     /**
      * Creates a new UIRenderer
@@ -47,7 +51,7 @@ public abstract class UIRenderer {
      * @param plugin SubPlugin
      * @param player Player
      */
-    public UIRenderer(SubPlugin plugin, UUID player) {
+    public UIRenderer(SubPlugin plugin, Player player) {
         Util.nullpo(plugin, player);
         this.plugin = plugin;
         this.player = player;
@@ -197,25 +201,22 @@ public abstract class UIRenderer {
      * @return Success Status
      */
     public boolean sendTitle(String line1, String line2, int fadein, int stay, int fadeout) {
-        if (USE_TITLES) {
+        if (USE_TITLES && player.isOnline()) {
             try {
-                Player player = Bukkit.getPlayer(this.player);
-                if (player != null) {
-                    if (TAPI_1_11) {
-                        if (line1 == null) {
-                            player.resetTitle();
-                        } else {
-                            player.sendTitle(line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20);
-                        }
-                        return true;
-                    } else if (TAPI_PLUGIN) {
-                        if (line1 == null) {
-                            com.connorlinfoot.titleapi.TitleAPI.clearTitle(player);
-                        } else {
-                            com.connorlinfoot.titleapi.TitleAPI.sendTitle(player, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20, line1, line2);
-                        }
-                        return true;
+                if (TAPI_1_11) {
+                    if (line1 == null) {
+                        player.resetTitle();
+                    } else {
+                        player.sendTitle(line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20);
                     }
+                    return true;
+                } else if (TAPI_PLUGIN) {
+                    if (line1 == null) {
+                        com.connorlinfoot.titleapi.TitleAPI.clearTitle(player);
+                    } else {
+                        com.connorlinfoot.titleapi.TitleAPI.sendTitle(player, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20, line1, line2);
+                    }
+                    return true;
                 }
             } catch (Throwable e) {
                 return false;
@@ -239,50 +240,49 @@ public abstract class UIRenderer {
      * @param subtitle Subtitle to display (or null to hide)
      */
     public void setDownloading(String subtitle) {
-        if (subtitle != null) {
-            if (!canSendTitle()) {
-                final String text = subtitle;
-                if (download != -1) Bukkit.getScheduler().cancelTask(download);
-                download = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", text));
-                    download = -1;
-                }, 50L);
-                return;
-            }
+        if (player.isOnline()) {
+            if (subtitle != null) {
+                if (!canSendTitle()) {
+                    final String text = subtitle;
+                    if (download != null) download.run();
+                    download = AgnosticScheduler.following(player).runs(plugin, cancel -> {
+                        if (tdownload != null && player.isOnline()) player.sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", text));
+                        download = null;
+                    }, 2500, TimeUnit.MILLISECONDS);
+                    return;
+                }
 
-            if (!subtitle.startsWith(Character.toString(ChatColor.COLOR_CHAR))) {
-                subtitle = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + subtitle;
-            }
-            if (tdownload == null) {
-                tdownload = new ContainedPair<String, Integer>(subtitle, 0);
+                if (!subtitle.startsWith(Character.toString(ChatColor.COLOR_CHAR))) {
+                    subtitle = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + subtitle;
+                }
+                if (tdownload == null) {
+                    tdownload = new ContainedPair<String, Integer>(subtitle, 0);
 
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
+                    AgnosticScheduler.following(player).repeats(plugin, cancel -> {
                         if (tdownload != null) {
                             if (++tdownload.value >= adownload.length) {
                                 tdownload.value = 0;
                             }
 
                             if (!sendTitle(adownload[tdownload.value], tdownload.key, 0, 10, 5)) {
-                                cancel();
+                                cancel.run();
                             }
                         } else {
                             sendTitle(null);
-                            cancel();
+                            cancel.run();
                         }
-                    }
-                }.runTaskTimer(plugin, 0, 1);
+                    }, 0, 50, TimeUnit.MILLISECONDS);
+                } else {
+                    tdownload.key = subtitle;
+                }
             } else {
-                tdownload.key = subtitle;
-            }
-        } else {
-            if (tdownload != null) {
-                tdownload = null;
-            }
-            if (download != -1) {
-                Bukkit.getScheduler().cancelTask(download);
-                download = -1;
+                if (tdownload != null) {
+                    tdownload = null;
+                }
+                if (download != null) {
+                    download.run();
+                    download = null;
+                }
             }
         }
     }

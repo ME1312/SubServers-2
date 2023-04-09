@@ -5,10 +5,11 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -55,15 +56,18 @@ public class PacketExControlPlayer implements PacketObjectIn<Integer>, PacketObj
             String command = data.getString(0x0001);
             UUID target =    (data.contains(0x0002)?data.getUUID(0x0002):null);
 
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                CommandSender sender = Bukkit.getConsoleSender();
-                if (target != null && (sender = Bukkit.getPlayer(target)) == null) {
+            if (target != null) {
+                final Player player;
+                if ((player = Bukkit.getPlayer(target)) == null) {
                     client.sendPacket(new PacketExControlPlayer(6, tracker));
+                    return;
                 } else {
-                    Bukkit.getServer().dispatchCommand(sender, command);
-                    client.sendPacket(new PacketExControlPlayer(0, tracker));
+                    AgnosticScheduler.following(player).runs(plugin, c -> Bukkit.getServer().dispatchCommand(player, command));
                 }
-            });
+            } else {
+                AgnosticScheduler.global.runs(plugin, c -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command));
+            }
+            client.sendPacket(new PacketExControlPlayer(0, tracker));
         } catch (Throwable e) {
             client.sendPacket(new PacketExControlPlayer(2, tracker));
             e.printStackTrace();

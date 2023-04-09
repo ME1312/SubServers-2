@@ -4,6 +4,7 @@ version: "2.19a"
 authors: ["ME1312"]
 softdepend: [TitleAPI, PlaceholderAPI]
 website: "https://github.com/ME1312/SubServers-2"
+folia-supported: true
 #commands:
 #  subservers:
 #    description: "The SubServers Command"

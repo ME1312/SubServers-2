@@ -89,7 +89,7 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>process-resources</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
@@ -97,6 +97,9 @@
                             <tasks>
                                 <mkdir dir="${project.build.directory}" />
                                 <copy file="${basedir}/../../LICENSE" todir="${project.build.directory}/classes" />
+                                <copy overwrite="true" todir="${project.build.directory}/classes">
+                                    <fileset dir="../../out/compile/target/SubServers.Client.Folia/classes" />
+                                </copy>
                             </tasks>
                         </configuration>
                     </execution>

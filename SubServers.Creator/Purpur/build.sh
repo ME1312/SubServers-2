@@ -15,19 +15,19 @@ function __DL() {
     fi
 }
 function __Restore() {
-    if [[ -f "Purpur.old.jar.x" ]]; then
+    if [[ -f "Purpur.old.jar" ]]; then
         if [[ -f "Purpur.jar" ]]; then
             rm -Rf Purpur.jar
         fi
-        mv Purpur.old.jar.x Purpur.jar
+        mv Purpur.old.jar Purpur.jar
     fi
 }
 echo Downloading Purpur...
 if [[ -f "Purpur.jar" ]]; then
-    if [[ -f "Purpur.old.jar.x" ]]; then
-        rm -Rf Purpur.old.jar.x
+    if [[ -f "Purpur.old.jar" ]]; then
+        rm -Rf Purpur.old.jar
     fi
-    mv Purpur.jar Purpur.old.jar.x
+    mv Purpur.jar Purpur.old.jar
 fi
 __DL Purpur.jar "https://api.purpurmc.org/v2/purpur/$version/latest/download"; __RETURN=$?
 if [[ $__RETURN -eq 0 ]]; then

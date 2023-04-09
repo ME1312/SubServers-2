@@ -1,11 +1,13 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
 import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Merger;
 import net.ME1312.SubData.Client.Library.EscapedOutputStream;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubStartEvent;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubStartedEvent;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubStopEvent;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubStoppedEvent;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.OfflineBlock;
 import net.ME1312.SubServers.Client.Bukkit.Library.SignState;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
@@ -73,6 +75,7 @@ public class SubSigns implements Listener {
 
     private void load() throws IOException {
         if (file.exists()) {
+            Merger merge = new Merger(this::listen);
             FileInputStream in = new FileInputStream(file);
             ByteArrayOutputStream string = new ByteArrayOutputStream();
             ByteBuffer magic = ByteBuffer.allocate(28).order(ByteOrder.BIG_ENDIAN);
@@ -95,12 +98,18 @@ public class SubSigns implements Listener {
                             Location loaded = location.load();
                             if (loaded == null) {
                                 data.put(location, name);
-                            } else if (loaded.getBlock().getState() instanceof Sign) {
-                                data.put(location, name);
-                                signs.put(loaded, translate(name));
-                                locations.put(name.toLowerCase(), loaded);
                             } else {
-                                Bukkit.getLogger().warning("SubServers > Removed invalid sign data: [\"" + loaded.getWorld().getName() + "\", " + location.x + ", " + location.y + ", " + location.z + "] -> \"" + name + '\"');
+                                merge.reserve();
+                                AgnosticScheduler.at(loaded).runs(plugin, c -> {
+                                    if (loaded.getBlock().getState() instanceof Sign) {
+                                        data.put(location, name);
+                                        signs.put(loaded, translate(name));
+                                        locations.put(name.toLowerCase(), loaded);
+                                    } else {
+                                        Bukkit.getLogger().warning("SubServers > Removed invalid sign data: [\"" + loaded.getWorld().getName() + "\", " + location.x + ", " + location.y + ", " + location.z + "] -> \"" + name + '\"');
+                                    }
+                                    merge.release();
+                                });
                             }
                             magic.clear();
                             string.reset();
@@ -118,7 +127,6 @@ public class SubSigns implements Listener {
                     string.write(b);
                 }
             }
-            listen();
         }
     }
 
@@ -223,7 +231,7 @@ public class SubSigns implements Listener {
 
     @SuppressWarnings("unchecked")
     private void refresh(Block block, Supplier<?> translator) {
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        AgnosticScheduler.at(block).runs(plugin, c -> {
             if (block.getState() instanceof Sign) {
                 Object object = translator.get();
                 String name;

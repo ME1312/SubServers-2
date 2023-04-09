@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Library;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
 import org.bukkit.Bukkit;
@@ -82,7 +83,7 @@ public class Metrics {
                         enabled,
                         this::appendPlatformData,
                         this::appendServiceData,
-                        submitDataTask -> Bukkit.getScheduler().runTask(plugin, submitDataTask),
+                        submitDataTask -> AgnosticScheduler.global.runs(plugin, c -> submitDataTask.run()),
                         plugin::isEnabled,
                         (message, error) -> this.plugin.getLogger().log(Level.WARNING, message, error),
                         (message) -> this.plugin.getLogger().log(Level.INFO, message),

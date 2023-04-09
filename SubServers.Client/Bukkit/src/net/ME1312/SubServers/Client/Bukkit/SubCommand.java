@@ -13,6 +13,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketInExRunEvent;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
@@ -32,6 +33,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permits;
@@ -71,7 +73,7 @@ public final class SubCommand extends Command {
                         sender.sendMessage(ChatColor.WHITE + "  " + Bukkit.getName() + ' ' + Bukkit.getVersion() + ChatColor.RESET + ',');
                         sender.sendMessage(ChatColor.WHITE + "  SubServers.Client.Bukkit v" + plugin.version.toExtendedString() + ((plugin.api.getPluginBuild() != null)?" (" + plugin.api.getPluginBuild() + ')':""));
                         sender.sendMessage("");
-                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        AgnosticScheduler.async.runs(plugin, c -> {
                             try {
                                 YAMLSection tags = new YAMLSection(plugin.parseJSON("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
                                 List<Version> versions = new LinkedList<Version>();
@@ -436,10 +438,10 @@ public final class SubCommand extends Command {
                                                     PacketInExRunEvent.callback("SubStoppedEvent", this);
                                                     String name = json.getString("server").toLowerCase();
                                                     if (listening.containsKey(name)) {
-                                                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                                        AgnosticScheduler.async.runs(plugin, c -> {
                                                             starter.accept(listening.get(name));
                                                             listening.remove(name);
-                                                        }, 5);
+                                                        }, 250, TimeUnit.MILLISECONDS);
                                                     }
                                                 }
                                             } catch (Exception e) {}

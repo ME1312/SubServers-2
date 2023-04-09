@@ -15,19 +15,19 @@ function __DL() {
     fi
 }
 function __Restore() {
-    if [[ -f "Sponge.old.jar.x" ]]; then
+    if [[ -f "Sponge.old.jar" ]]; then
         if [[ -f "Sponge.jar" ]]; then
             rm -Rf Sponge.jar
         fi
-        mv Sponge.old.jar.x Sponge.jar
+        mv Sponge.old.jar Sponge.jar
     fi
 }
 echo Downloading SpongeVanilla...
 if [[ -f "Sponge.jar" ]]; then
-    if [[ -f "Sponge.old.jar.x" ]]; then
-        rm -Rf Sponge.old.jar.x
+    if [[ -f "Sponge.old.jar" ]]; then
+        rm -Rf Sponge.old.jar
     fi
-    mv Sponge.jar Sponge.old.jar.x
+    mv Sponge.jar Sponge.old.jar
 fi
 __DL Sponge.jar "https://repo.spongepowered.org/maven/org/spongepowered/spongevanilla/$sp_version/spongevanilla-$sp_version.jar"; __RETURN=$?
 if [[ $__RETURN -eq 0 ]]; then

@@ -41,10 +41,10 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Spigot-$version.jar" ]] || [[ "$mode" ==
         if [[ $__RETURN -eq 0 ]]; then
             echo Copying Finished Jar...
             if [[ -f "Spigot.jar" ]]; then
-                if [[ -f "Spigot.old.jar.x" ]]; then
-                    rm -Rf Spigot.old.jar.x
+                if [[ -f "Spigot.old.jar" ]]; then
+                    rm -Rf Spigot.old.jar
                 fi
-                mv Spigot.jar Spigot.old.jar.x
+                mv Spigot.jar Spigot.old.jar
             fi
             if [[ ! -z "$cache" ]] && [[ -d "$cache" ]]; then
                 if [[ -f "$cache/Spigot-$version.jar" ]]; then

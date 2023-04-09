@@ -8,6 +8,7 @@ import net.ME1312.Galaxi.Library.Merger;
 import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Event.*;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
@@ -18,13 +19,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +38,7 @@ public final class Placeholders {
     private final SubPlugin plugin;
     public final Cache cache;
     private MethodHandle papi;
-    private BukkitTask task;
+    private Runnable task;
     private boolean init;
 
     /**
@@ -56,11 +58,11 @@ public final class Placeholders {
             init = true;
             papi = Try.all.get(() -> MethodHandles.publicLookup().findStatic(Class.forName("me.clip.placeholderapi.PlaceholderAPI"), "setPlaceholders", MethodType.methodType(String.class, new Class[]{ OfflinePlayer.class, String.class })));
             Bukkit.getPluginManager().registerEvents(cache.events, plugin);
-            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+            AgnosticScheduler.async.runs(plugin, c -> {
                 if (task == null) {
                     int interval = plugin.config.get().getMap("Settings").getInt("PlaceholderAPI-Cache-Interval", 30);
                     int start = interval - new Random().nextInt(interval + 1); // Don't have all servers request at the same time
-                    Runnable task = () -> cache.refresh(() -> {
+                    Consumer<Runnable> task = c2 -> cache.refresh(() -> {
                         for (Runnable listener : listeners) {
                             try {
                                 listener.run();
@@ -69,17 +71,17 @@ public final class Placeholders {
                             }
                         }
                     });
-                    this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task, 20L * start, 20L * interval);
-                    task.run();
+                    this.task = AgnosticScheduler.async.repeats(plugin, task, start, interval, TimeUnit.SECONDS);
+                    task.accept(null);
                 }
-            }, 120L);
+            }, 6, TimeUnit.SECONDS);
         }
     }
 
     public void stop() {
         if (task != null) {
             try {
-                task.cancel();
+                task.run();
             } catch (Throwable exception) {}
             task = null;
         }
@@ -650,7 +652,7 @@ public final class Placeholders {
         }
 
         private final class Events implements Listener {
-            private HashMap<String, BukkitTask> edits = new HashMap<String, BukkitTask>();
+            private HashMap<String, Runnable> edits = new HashMap<String, Runnable>();
 
             @EventHandler(priority = EventPriority.LOWEST)
             public void add(SubAddProxyEvent e) {
@@ -679,8 +681,8 @@ public final class Placeholders {
             @EventHandler(priority = EventPriority.LOWEST)
             public void edit(SubEditServerEvent e) {
                 String s = e.getServer().toLowerCase();
-                if (edits.containsKey(s)) edits.get(s).cancel();
-                edits.put(s, Bukkit.getScheduler().runTaskLater(plugin, servers.containsKey(s)? servers.get(s)::refresh : () -> add(s), 120L));
+                if (edits.containsKey(s)) edits.get(s).run();
+                edits.put(s, AgnosticScheduler.async.runs(plugin, servers.containsKey(s)? (c -> servers.get(s).refresh()) : (c -> add(s)), 6, TimeUnit.SECONDS));
             }
 
             @EventHandler(priority = EventPriority.LOWEST)

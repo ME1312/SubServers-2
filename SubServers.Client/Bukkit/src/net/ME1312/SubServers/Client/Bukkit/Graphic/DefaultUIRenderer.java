@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
 import net.ME1312.SubServers.Client.Common.Network.API.Server;
@@ -32,13 +33,9 @@ public class DefaultUIRenderer extends UIRenderer {
     int lastPage = 1;
     Runnable lastMenu = null;
     boolean open = false;
-    final UUID player;
-    private SubPlugin plugin;
 
-    DefaultUIRenderer(SubPlugin plugin, UUID player) {
+    DefaultUIRenderer(SubPlugin plugin, Player player) {
         super(plugin, player);
-        this.plugin = plugin;
-        this.player = player;
     }
 
     public void newUI() {
@@ -102,7 +99,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void hostMenu(final int page) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title")));
-        plugin.api.getHosts(hosts -> plugin.api.getGroups(groups -> Bukkit.getScheduler().runTask(plugin, () -> {
+        plugin.api.getHosts(hosts -> plugin.api.getGroups(groups -> AgnosticScheduler.following(player).runs(plugin, c -> {
             setDownloading(null);
             lastVisitedObjects[0] = null;
             lastPage = page;
@@ -227,14 +224,14 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(i, block);
             }
 
-            Bukkit.getPlayer(player).openInventory(inv);
+            player.openInventory(inv);
             open = true;
         })));
     }
 
     public void hostAdmin(final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").replace("$str$", name)));
-        plugin.api.getHost(name, host -> Bukkit.getScheduler().runTask(plugin, () -> {
+        plugin.api.getHost(name, host -> AgnosticScheduler.following(player).runs(plugin, c -> {
             windowHistory.add(() -> hostAdmin(name));
             if (host == null) {
                 if (hasHistory()) back();
@@ -257,7 +254,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     i++;
                 }
 
-                Player player = Bukkit.getPlayer(this.player);
+                Player player = this.player;
                 if (!permits(name, player, "subservers.host.%.*", "subservers.host.%.create")) {
                     block = color(7);
                     blockMeta = block.getItemMeta();
@@ -339,7 +336,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     inv.setItem(35, block);
                 }
 
-                Bukkit.getPlayer(this.player).openInventory(inv);
+                player.openInventory(inv);
                 open = true;
             }
         }));
@@ -350,7 +347,7 @@ public class DefaultUIRenderer extends UIRenderer {
         if (!options.init()) windowHistory.add(() -> hostCreator(options));
         lastVisitedObjects[0] = options;
 
-        plugin.api.getHost(options.getHost(), host -> Bukkit.getScheduler().runTask(plugin, () -> {
+        plugin.api.getHost(options.getHost(), host -> AgnosticScheduler.following(player).runs(plugin, c -> {
             if (host == null || !host.isAvailable() || !host.isEnabled()) {
                 lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
@@ -466,7 +463,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     inv.setItem(53, block);
                 }
 
-                Bukkit.getPlayer(player).openInventory(inv);
+                player.openInventory(inv);
                 open = true;
             }
         }));
@@ -476,7 +473,7 @@ public class DefaultUIRenderer extends UIRenderer {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").replace("$str$", options.getHost())));
         options.init();
         lastVisitedObjects[0] = options;
-        plugin.api.getHost(options.getHost(), host -> Bukkit.getScheduler().runTask(plugin, () -> {
+        plugin.api.getHost(options.getHost(), host -> AgnosticScheduler.following(player).runs(plugin, c -> {
             if (host == null || !host.isAvailable() || !host.isEnabled()) {
                 lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
@@ -579,7 +576,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     inv.setItem(i, block);
                 }
 
-                Bukkit.getPlayer(player).openInventory(inv);
+                player.openInventory(inv);
                 open = true;
             }
         }));
@@ -587,7 +584,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void hostPlugin(final int page, final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", name)));
-        plugin.api.getHost(name, host -> Bukkit.getScheduler().runTask(plugin, () -> {
+        plugin.api.getHost(name, host -> AgnosticScheduler.following(player).runs(plugin, c -> {
             windowHistory.add(() -> hostPlugin(page, name));
             if (host == null) {
                 if (hasHistory()) back();
@@ -687,7 +684,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     inv.setItem(i, block);
                 }
 
-                Bukkit.getPlayer(player).openInventory(inv);
+                player.openInventory(inv);
                 open = true;
             }
         }));
@@ -695,7 +692,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void groupMenu(final int page) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title")));
-        plugin.api.getServers(servers -> Bukkit.getScheduler().runTask(plugin, () -> {
+        plugin.api.getServers(servers -> AgnosticScheduler.following(player).runs(plugin, c -> {
             setDownloading(null);
             lastVisitedObjects[0] = null;
             lastPage = page;
@@ -820,7 +817,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(i, block);
             }
 
-            Bukkit.getPlayer(player).openInventory(inv);
+            player.openInventory(inv);
             open = true;
         }));
     }
@@ -829,7 +826,7 @@ public class DefaultUIRenderer extends UIRenderer {
         setDownloading(ChatColor.stripColor((host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):((group.length() == 0)?plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title-Ungrouped"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group))):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", host)));
         Value<String> hostname = new Container<String>(host);
         Value<List<Server>> servercontainer = new Container<List<Server>>(new LinkedList<Server>());
-        Runnable renderer = () -> Bukkit.getScheduler().runTask(plugin, () -> {
+        Runnable renderer = () -> AgnosticScheduler.following(player).runs(plugin, c -> {
             setDownloading(null);
             lastPage = page;
 
@@ -985,7 +982,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(i, block);
             }
 
-            Bukkit.getPlayer(player).openInventory(inv);
+            player.openInventory(inv);
             open = true;
         });
 
@@ -1018,7 +1015,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void serverAdmin(final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Title").replace("$str$", name)));
-        BiConsumer<Server, Host> renderer = (server, host) -> Bukkit.getScheduler().runTask(plugin, () -> {
+        BiConsumer<Server, Host> renderer = (server, host) -> AgnosticScheduler.following(player).runs(plugin, c -> {
             setDownloading(null);
             lastVisitedObjects[0] = server;
             ItemStack block;
@@ -1038,7 +1035,7 @@ public class DefaultUIRenderer extends UIRenderer {
             }
             i = 0;
 
-            Player player = Bukkit.getPlayer(this.player);
+            Player player = this.player;
             if (host == null || ((SubServer) server).isRunning()) {
                 if (host == null || !permits(server, player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
                     block = color(7);
@@ -1250,7 +1247,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void serverPlugin(final int page, final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", name)));
-        plugin.api.getServer(name, server -> Bukkit.getScheduler().runTask(plugin, () -> {
+        plugin.api.getServer(name, server -> AgnosticScheduler.following(player).runs(plugin, c -> {
             windowHistory.add(() -> serverPlugin(page, name));
             if (server == null) {
                 if (hasHistory()) back();
@@ -1350,7 +1347,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     inv.setItem(i, block);
                 }
 
-                Bukkit.getPlayer(player).openInventory(inv);
+                player.openInventory(inv);
                 open = true;
             }
         }));

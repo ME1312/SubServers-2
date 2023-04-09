@@ -33,10 +33,10 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Vanilla-$version.jar" ]]; then
             echo Copying Finished Jar...
             cd ../
             if [[ -f "Vanilla.jar" ]]; then
-                if [[ -f "Vanilla.old.jar.x" ]]; then
-                    rm -Rf Vanilla.old.jar.x
+                if [[ -f "Vanilla.old.jar" ]]; then
+                    rm -Rf Vanilla.old.jar
                 fi
-                mv Vanilla.jar Vanilla.old.jar.x
+                mv Vanilla.jar Vanilla.old.jar
             fi
             if [[ ! -z "$cache" ]] && [[ -d "$cache" ]]; then
                 cp "VanillaCord/out/$version-bungee.jar" "$cache/Vanilla-$version.jar"

@@ -8,6 +8,7 @@ import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.AgnosticScheduler;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketInExRunEvent;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
@@ -30,6 +31,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permits;
@@ -54,8 +56,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
     }
 
     public DefaultUIRenderer getRenderer(Player player) {
-        if (!gui.containsKey(player.getUniqueId())) gui.put(player.getUniqueId(), new DefaultUIRenderer(plugin, player.getUniqueId()));
-        return gui.get(player.getUniqueId());
+        return gui.computeIfAbsent(player.getUniqueId(), k -> new DefaultUIRenderer(plugin, player));
     }
 
     public void disable() {
@@ -132,7 +133,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 if (m.getString("message").contains(" ")) {
                                     if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Invalid-Title"), 4 * 20))
                                         player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Invalid"));
-                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
+                                    AgnosticScheduler.async.runs(plugin, c -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4, TimeUnit.SECONDS);
                                 } else {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                     plugin.api.getSubServer(m.getString("message"), server -> {
@@ -140,7 +141,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                             gui.setDownloading(null);
                                             if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Exists-Title"), 4 * 20))
                                                 player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Exists"));
-                                            Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
+                                            AgnosticScheduler.async.runs(plugin, c -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4, TimeUnit.SECONDS);
                                         } else {
                                             ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setName(m.getString("message"));
                                             gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
@@ -172,7 +173,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 } else if (!Try.all.run(() -> Integer.parseInt(m.getString("message"))) || Integer.parseInt(m.getString("message")) <= 0 || Integer.parseInt(m.getString("message")) > 65535) {
                                     if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid-Title"), 4 * 20))
                                         player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid"));
-                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
+                                    AgnosticScheduler.async.runs(plugin, c -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4, TimeUnit.SECONDS);
                                 } else {
                                     ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setPort(Integer.valueOf(m.getString("message")));
                                     gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
@@ -347,7 +348,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 ((SubServer) gui.lastVisitedObjects[0]).start(player.getUniqueId(), response -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Server-Admin.Start.Title"));
-                                    Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 30);
+                                    AgnosticScheduler.async.runs(plugin, c -> gui.reopen(), 1500, TimeUnit.MILLISECONDS);
                                 });
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Server-Admin.Stop"))) {
@@ -362,7 +363,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                             if (listening.value()) if (!json.getString("server").equalsIgnoreCase(((Server) gui.lastVisitedObjects[0]).getName())) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             } else {
-                                                Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 5);
+                                                AgnosticScheduler.async.runs(plugin, c -> gui.reopen(), 250, TimeUnit.MILLISECONDS);
                                             }
                                         } catch (Exception e) {}
                                     }
