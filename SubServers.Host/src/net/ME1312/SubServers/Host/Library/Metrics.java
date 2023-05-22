@@ -52,7 +52,7 @@ public class Metrics {
      */
     public Metrics(ExHost host) {
         boolean enabled = true;
-        File configPath = new File(new File(GalaxiEngine.getInstance().getRuntimeDirectory(), "plugins"), "bStats");
+        File configPath = new File(new File(GalaxiEngine.getInstance().getRuntimeDirectory(), "Plugins"), "bStats");
         configPath.mkdirs();
         File configFile = new File(configPath, "config.yml");
         try {
