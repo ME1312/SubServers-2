@@ -64,8 +64,10 @@ public class InternalSubCreator extends SubCreator {
         private final int port;
         private final String prefix;
         private final InternalSubLogger log;
+        private final LinkedList<String> replace;
         private final HashMap<String, String> replacements;
         private final Consumer<SubServer> callback;
+        private Boolean install;
         private Process process;
 
         private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, Consumer<SubServer> callback) {
@@ -77,6 +79,7 @@ public class InternalSubCreator extends SubCreator {
             this.version = version;
             this.port = port;
             this.log = new InternalSubLogger(null, this, prefix = name + File.separator + "Creator", InternalSubCreator.this.log, null);
+           (this.replace = new LinkedList<String>()).add("/server.properties");
             this.replacements = new HashMap<String, String>();
             this.callback = callback;
         }
@@ -90,6 +93,7 @@ public class InternalSubCreator extends SubCreator {
             this.version = version;
             this.port = server.getAddress().getPort();
             this.log = new InternalSubLogger(null, this, prefix = name + File.separator + "Updater", InternalSubCreator.this.log, null);
+           (this.replace = new LinkedList<String>()).add("/server.properties");
             this.replacements = new HashMap<String, String>();
             this.callback = callback;
         }
@@ -132,6 +136,8 @@ public class InternalSubCreator extends SubCreator {
                 log.log(INFO, "Loading" + ((template.isDynamic())?" Dynamic":"") + " Template: " + template.getDisplayName());
                 updateDirectory(template.getDirectory(), dir, template.getBuildOptions().getBoolean("Update-Files", false));
 
+                install = template.getBuildOptions().getBoolean("Install-Client", install);
+                replace.addAll(template.getBuildOptions().getStringList("Replace", Collections.emptyList()));
                 for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements", new ObjectMap<>()).getValues()) if (!replacement.isNull()) {
                     replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asString());
                 }
@@ -259,12 +265,8 @@ public class InternalSubCreator extends SubCreator {
             ReplacementScanner replacements = new ReplacementScanner(this.replacements);
             if (config != null) {
                 try {
-                    if (template.getBuildOptions().getBoolean("Install-Client", true)) generateClient(dir, template.getType(), name);
-
-                    LinkedList<String> masks = new LinkedList<>();
-                    masks.add("/server.properties");
-                    masks.addAll(template.getBuildOptions().getStringList("Replace", Collections.emptyList()));
-                    replacements.replace(dir, masks.toArray(new String[0]));
+                    if (install != Boolean.FALSE) generateClient(dir, template.getType(), name);
+                    replacements.replace(dir, replace.toArray(new String[0]));
                 } catch (Exception e) {
                     config = null;
                     e.printStackTrace();

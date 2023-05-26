@@ -270,7 +270,9 @@ public class SubCreatorImpl {
         private final UUID address;
         private final UUID tracker;
         private final SubLoggerImpl log;
+        private final LinkedList<String> replace;
         private final HashMap<String, String> replacements;
+        private Boolean install;
         private Process process;
 
         private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, Boolean mode, UUID address, UUID tracker) {
@@ -285,6 +287,7 @@ public class SubCreatorImpl {
             this.mode = mode;
             this.log = new SubLoggerImpl(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
             this.replacements = new HashMap<String, String>();
+           (this.replace = new LinkedList<String>()).add("/server.properties");
             this.address = address;
             this.tracker = tracker;
 
@@ -330,6 +333,8 @@ public class SubCreatorImpl {
                 log.logger.info.println("Loading" + ((template.isDynamic())?" Dynamic":"") + " Template: " + template.getDisplayName());
                 updateDirectory(template.getDirectory(), dir, template.getBuildOptions().getBoolean("Update-Files", false));
 
+                install = template.getBuildOptions().getBoolean("Install-Client", install);
+                replace.addAll(template.getBuildOptions().getStringList("Replace", Collections.emptyList()));
                 for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements", new ObjectMap<>()).getValues()) if (!replacement.isNull()) {
                     replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asString());
                 }
@@ -455,12 +460,8 @@ public class SubCreatorImpl {
             ReplacementScanner replacements = new ReplacementScanner(this.replacements);
             if (config != null) {
                 try {
-                    if (template.getBuildOptions().getBoolean("Install-Client", true)) generateClient(dir, template.getType(), name);
-
-                    LinkedList<String> masks = new LinkedList<>();
-                    masks.add("/server.properties");
-                    masks.addAll(template.getBuildOptions().getStringList("Replace", Collections.emptyList()));
-                    replacements.replace(dir, masks.toArray(new String[0]));
+                    if (install != Boolean.FALSE) generateClient(dir, template.getType(), name);
+                    replacements.replace(dir, replace.toArray(new String[0]));
                 } catch (Exception e) {
                     config = null;
                     e.printStackTrace();
