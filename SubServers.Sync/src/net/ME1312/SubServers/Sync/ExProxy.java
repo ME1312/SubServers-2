@@ -76,7 +76,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
     public final Collection<Channel> listeners = super.listeners;
-    public static final Version version = Version.fromString("2.19a");
+    public static final Version version = Version.fromString("2.20a");
 
     public final boolean isPatched;
     public long lastReload = -1;

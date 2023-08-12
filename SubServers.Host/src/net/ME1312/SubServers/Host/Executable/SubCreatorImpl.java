@@ -272,7 +272,7 @@ public class SubCreatorImpl {
         private final SubLoggerImpl log;
         private final LinkedList<String> replace;
         private final HashMap<String, String> replacements;
-        private Boolean install;
+        private boolean install;
         private Process process;
 
         private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, Boolean mode, UUID address, UUID tracker) {
@@ -288,6 +288,7 @@ public class SubCreatorImpl {
             this.log = new SubLoggerImpl(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
             this.replacements = new HashMap<String, String>();
            (this.replace = new LinkedList<String>()).add("/server.properties");
+            this.install = true;
             this.address = address;
             this.tracker = tracker;
 
@@ -460,7 +461,7 @@ public class SubCreatorImpl {
             ReplacementScanner replacements = new ReplacementScanner(this.replacements);
             if (config != null) {
                 try {
-                    if (install != Boolean.FALSE) generateClient(dir, template.getType(), name);
+                    if (install) generateClient(dir, template.getType(), name);
                     replacements.replace(dir, replace.toArray(new String[0]));
                 } catch (Exception e) {
                     config = null;

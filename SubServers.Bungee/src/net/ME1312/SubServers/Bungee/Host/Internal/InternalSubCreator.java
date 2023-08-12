@@ -67,7 +67,7 @@ public class InternalSubCreator extends SubCreator {
         private final LinkedList<String> replace;
         private final HashMap<String, String> replacements;
         private final Consumer<SubServer> callback;
-        private Boolean install;
+        private boolean install;
         private Process process;
 
         private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, Consumer<SubServer> callback) {
@@ -82,6 +82,7 @@ public class InternalSubCreator extends SubCreator {
            (this.replace = new LinkedList<String>()).add("/server.properties");
             this.replacements = new HashMap<String, String>();
             this.callback = callback;
+            this.install = true;
         }
 
         private CreatorTask(UUID player, SubServer server, ServerTemplate template, Version version, Consumer<SubServer> callback) {
@@ -96,6 +97,7 @@ public class InternalSubCreator extends SubCreator {
            (this.replace = new LinkedList<String>()).add("/server.properties");
             this.replacements = new HashMap<String, String>();
             this.callback = callback;
+            this.install = true;
         }
 
         private ObjectMap<String> build(File dir, ServerTemplate template, List<ServerTemplate> history, List<ServerTemplate> stack) throws SubCreatorException {
@@ -265,7 +267,7 @@ public class InternalSubCreator extends SubCreator {
             ReplacementScanner replacements = new ReplacementScanner(this.replacements);
             if (config != null) {
                 try {
-                    if (install != Boolean.FALSE) generateClient(dir, template.getType(), name);
+                    if (install) generateClient(dir, template.getType(), name);
                     replacements.replace(dir, replace.toArray(new String[0]));
                 } catch (Exception e) {
                     config = null;

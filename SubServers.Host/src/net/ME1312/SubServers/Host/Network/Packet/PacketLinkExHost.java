@@ -57,8 +57,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
             setReady(client.getConnection());
         } else {
             log.severe("Could not link name with host" + ((data.contains(0x0002))?": "+data.getString(0x0002):'.'));
-            DebugUtil.logException(new IllegalStateException(), log);
-            GalaxiEngine.getInstance().stop();
+            client.getConnection().close();
         }
     }
 }

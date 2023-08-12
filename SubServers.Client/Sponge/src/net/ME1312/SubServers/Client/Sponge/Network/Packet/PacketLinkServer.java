@@ -79,8 +79,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
                         log.info("Use the server \"Name\" option to override auto-linking");
                 }
             } catch (Exception e) {}
-            new IllegalStateException().printStackTrace();
-            plugin.disable(null);
+            client.getConnection().close();
         }
     }
 }

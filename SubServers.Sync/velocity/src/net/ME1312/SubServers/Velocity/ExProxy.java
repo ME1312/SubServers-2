@@ -64,7 +64,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(id = "subservers-sync", name = "SubServers-Sync", authors = "ME1312", version = "2.19a", url = "https://github.com/ME1312/SubServers-2", description = "Dynamically sync player and server connection info over multiple proxy instances")
+@Plugin(id = "subservers-sync", name = "SubServers-Sync", authors = "ME1312", version = "2.20a", url = "https://github.com/ME1312/SubServers-2", description = "Dynamically sync player and server connection info over multiple proxy instances")
 public class ExProxy {
 
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();

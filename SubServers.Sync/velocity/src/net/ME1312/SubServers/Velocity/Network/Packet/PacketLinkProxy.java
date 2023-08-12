@@ -65,7 +65,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
                         Logger.get("SubData").info("Use the proxy \"Name\" option to override auto-linking");
                 }
             } catch (Exception e) {}
-            new IllegalStateException().printStackTrace();
+            client.getConnection().close();
         }
     }
 }

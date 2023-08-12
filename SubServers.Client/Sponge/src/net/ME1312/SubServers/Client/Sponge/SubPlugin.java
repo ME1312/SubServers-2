@@ -48,7 +48,7 @@ import static net.ME1312.SubServers.Client.Sponge.Library.AccessMode.NO_COMMANDS
 /**
  * SubServers Client Plugin Class
  */
-@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.19a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
+@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.20a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
 public final class SubPlugin {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     Pair<Long, Map<String, Map<String, String>>> lang = null;
