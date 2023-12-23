@@ -138,24 +138,16 @@ public final class ExHost {
                                 reader.close();
                                 if (json.keySet().contains("Timestamp")) {
                                     if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
-                                        Directories.delete(file);
-                                        f--;
-                                        log.info.println("Removed ./Recently Deleted/" + file.getName());
+                                        f = removeFile(file, f, true);
                                     }
                                 } else {
-                                    Directories.delete(file);
-                                    f--;
-                                    log.info.println("Removed ./Recently Deleted/" + file.getName());
+                                    f = removeFile(file, f, true);
                                 }
                             } else {
-                                Directories.delete(file);
-                                f--;
-                                log.info.println("Removed ./Recently Deleted/" + file.getName());
+                                f = removeFile(file, f, true);
                             }
                         } else {
-                            Files.delete(file.toPath());
-                            f--;
-                            log.info.println("Removed ./Recently Deleted/" + file.getName());
+                            f = removeFile(file, f, false);
                         }
                     } catch (Exception e) {
                         log.error.println(e);
@@ -247,6 +239,26 @@ public final class ExHost {
         }
     }
 
+    /**
+     * Removes a file from the Recently Deleted folder and decrements the 
+     * fileLength
+     * 
+     * @param file The file to remove
+     * @param fileLength The current file length
+     * @param isDir Whether or not the file is a directory\
+     * @return The new file length
+     */
+    private int removeFile(File file, int fileLength, boolean isDir) {
+        if(isDir) { 
+            Directories.delete(file);
+        } else {
+            Files.delete(file.toPath());
+        }
+        fileLength--;
+        log.info.println("Removed ./Recently Deleted/" + file.getName());
+        return fileLength;
+    }
+    
     private void loadDefaults() {
         new SubCommand(this).load();
     }
