@@ -39,9 +39,9 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Vanilla-$version.jar" ]]; then
                 mv Vanilla.jar Vanilla.old.jar
             fi
             if [[ ! -z "$cache" ]] && [[ -d "$cache" ]]; then
-                cp "VanillaCord/out/$version-bungee.jar" "$cache/Vanilla-$version.jar"
+                cp "VanillaCord/out/$version.jar" "$cache/Vanilla-$version.jar"
             fi
-            cp "VanillaCord/out/$version-bungee.jar" Vanilla.jar
+            cp "VanillaCord/out/$version.jar" Vanilla.jar
             echo Cleaning Up...
             rm -Rf VanillaCord
             rm -Rf "$0"
