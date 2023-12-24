@@ -23,14 +23,14 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Vanilla-$version.jar" ]]; then
         rm -Rf VanillaCord
     fi
     mkdir VanillaCord
-    echo Downloading the VanillaCord Launcher...
+    echo Downloading VanillaCord...
     __DL VanillaCord/VanillaCord.jar https://dev.me1312.net/jenkins/job/VanillaCord/lastSuccessfulBuild/artifact/artifacts/VanillaCord.jar; __RETURN=$?
     if [[ $__RETURN -eq 0 ]]; then
         cd VanillaCord
         echo Launching VanillaCord
         "$java" -jar VanillaCord.jar "$version"; __RETURN=$?;
         if [[ $__RETURN -eq 0 ]]; then
-            echo Copying Finished Jar...
+            echo Copying Finished Jarfile...
             cd ../
             if [[ -f "Vanilla.jar" ]]; then
                 if [[ -f "Vanilla.old.jar" ]]; then
@@ -59,7 +59,7 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Vanilla-$version.jar" ]]; then
         exit 3
     fi
 else
-    echo Copying Cached Jar...
+    echo Copying Cached Jarfile...
     cp "$cache/Vanilla-$version.jar" Vanilla.jar
     echo Cleaning Up...
     rm -Rf "$0"

@@ -127,44 +127,49 @@ public final class ExHost {
                 log.info.println("Created ./Templates/");
             }
 
-            if (new File(engine.getRuntimeDirectory(), "Recently Deleted").exists()) {
-                int f = new File(engine.getRuntimeDirectory(), "Recently Deleted").listFiles().length;
-                for (File file : new File(engine.getRuntimeDirectory(), "Recently Deleted").listFiles()) {
+            TimerTask cleaner;
+            (cleaner = new TimerTask() {
+                @Override
+                public void run() {
                     try {
-                        if (file.isDirectory()) {
-                            if (new File(engine.getRuntimeDirectory(), "Recently Deleted/" + file.getName() + "/info.json").exists()) {
-                                FileReader reader = new FileReader(new File(engine.getRuntimeDirectory(), "Recently Deleted/" + file.getName() + "/info.json"));
-                                JSONObject json = new JSONObject(Util.readAll(reader));
-                                reader.close();
-                                if (json.keySet().contains("Timestamp")) {
-                                    if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
+                        File recycle = new File(engine.getRuntimeDirectory(), "Recently Deleted");
+                        if (recycle.isDirectory()) {
+                            int kept = 0;
+                            for (File file : recycle.listFiles()) {
+                                try {
+                                    if (file.isDirectory()) {
+                                        if (new File(recycle, file.getName() + "/info.json").exists()) {
+                                            FileReader reader = new FileReader(new File(recycle, file.getName() + "/info.json"));
+                                            JSONObject info = new JSONObject(Util.readAll(reader));
+                                            reader.close();
+                                            if (info.keySet().contains("Timestamp")) {
+                                                if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) < 7) {
+                                                    ++kept;
+                                                    continue;
+                                                }
+                                            }
+                                        }
                                         Directories.delete(file);
-                                        f--;
-                                        log.info.println("Removed ./Recently Deleted/" + file.getName());
+                                    } else {
+                                        Files.delete(file.toPath());
                                     }
-                                } else {
-                                    Directories.delete(file);
-                                    f--;
-                                    log.info.println("Removed ./Recently Deleted/" + file.getName());
+                                    log.info.println("Removed ./SubServers/Recently Deleted/" + file.getName());
+                                } catch (Exception e) {
+                                    log.error.println("Problem scanning ./SubServers/Recently Deleted/" + file.getName());
+                                    log.error.println(e);
+                                    Files.delete(file.toPath());
                                 }
-                            } else {
-                                Directories.delete(file);
-                                f--;
-                                log.info.println("Removed ./Recently Deleted/" + file.getName());
                             }
-                        } else {
-                            Files.delete(file.toPath());
-                            f--;
-                            log.info.println("Removed ./Recently Deleted/" + file.getName());
+                            if (kept == 0) {
+                                Files.delete(recycle.toPath());
+                            }
                         }
                     } catch (Exception e) {
                         log.error.println(e);
                     }
                 }
-                if (f <= 0) {
-                    Files.delete(new File(engine.getRuntimeDirectory(), "Recently Deleted").toPath());
-                }
-            }
+            }).run();
+            new Timer("SubServers.Bungee::Recycle_Cleaner").scheduleAtFixedRate(cleaner, TimeUnit.DAYS.toMillis(7), TimeUnit.DAYS.toMillis(7));
 
             Util.reflect(SubLoggerImpl.class.getDeclaredField("logn"), null, config.get().getMap("Settings").getBoolean("Network-Log", true));
             Util.reflect(SubLoggerImpl.class.getDeclaredField("logc"), null, config.get().getMap("Settings").getBoolean("Console-Log", true));

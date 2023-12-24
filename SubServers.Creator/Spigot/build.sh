@@ -39,7 +39,7 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Spigot-$version.jar" ]] || [[ "$mode" ==
         fi
         cd ../
         if [[ $__RETURN -eq 0 ]]; then
-            echo Copying Finished Jar...
+            echo Copying Finished Jarfile...
             if [[ -f "Spigot.jar" ]]; then
                 if [[ -f "Spigot.old.jar" ]]; then
                     rm -Rf Spigot.old.jar
@@ -71,7 +71,7 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Spigot-$version.jar" ]] || [[ "$mode" ==
         exit 3
     fi
 else
-    echo Copying Cached Jar...
+    echo Copying Cached Jarfile...
     cp "$cache/Spigot-$version.jar" Spigot.jar
     echo Cleaning Up...
     rm -Rf "$0"

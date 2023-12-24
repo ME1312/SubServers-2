@@ -186,59 +186,49 @@ public final class SubProxy extends BungeeCommon implements Listener {
             }
         }
 
-        Runnable clean = () -> {
-            try {
-                if (new File(dir, "Recently Deleted").exists()) {
-                    int f = new File(dir, "Recently Deleted").listFiles().length;
-                    for (File file : new File(dir, "Recently Deleted").listFiles()) {
-                        try {
-                            if (file.isDirectory()) {
-                                if (new File(dir, "Recently Deleted/" + file.getName() + "/info.json").exists()) {
-                                    FileReader reader = new FileReader(new File(dir, "Recently Deleted/" + file.getName() + "/info.json"));
-                                    YAMLSection info = new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class));
-                                    reader.close();
-                                    if (info.contains("Timestamp")) {
-                                        if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) >= 7) {
-                                            Directories.delete(file);
-                                            f--;
-                                            Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
-                                        }
-                                    } else {
-                                        Directories.delete(file);
-                                        f--;
-                                        Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
-                                    }
-                                } else {
-                                    Directories.delete(file);
-                                    f--;
-                                    Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
-                                }
-                            } else {
-                                Files.delete(file.toPath());
-                                f--;
-                                Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
-                            }
-                        } catch (Exception e) {
-                            Logger.get("SubServers").info("Problem scanning ./SubServers/Recently Deleted/" + file.getName());
-                            e.printStackTrace();
-                            Files.delete(file.toPath());
-                        }
-                    }
-                    if (f <= 0) {
-                        Files.delete(new File(dir, "Recently Deleted").toPath());
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        };
-        clean.run();
-        new Timer("SubServers.Bungee::Recycle_Cleaner").scheduleAtFixedRate(new TimerTask() {
+        TimerTask cleaner;
+        (cleaner = new TimerTask() {
             @Override
             public void run() {
-                clean.run();
+                try {
+                    File recycle = new File(dir, "Recently Deleted");
+                    if (recycle.isDirectory()) {
+                        int kept = 0;
+                        for (File file : recycle.listFiles()) {
+                            try {
+                                if (file.isDirectory()) {
+                                    if (new File(recycle, file.getName() + "/info.json").exists()) {
+                                        FileReader reader = new FileReader(new File(recycle, file.getName() + "/info.json"));
+                                        YAMLSection info = new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class));
+                                        reader.close();
+                                        if (info.contains("Timestamp")) {
+                                            if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) < 7) {
+                                                ++kept;
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                    Directories.delete(file);
+                                } else {
+                                    Files.delete(file.toPath());
+                                }
+                                Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
+                            } catch (Exception e) {
+                                Logger.get("SubServers").warning("Problem scanning ./SubServers/Recently Deleted/" + file.getName());
+                                e.printStackTrace();
+                                Files.delete(file.toPath());
+                            }
+                        }
+                        if (kept == 0) {
+                            Files.delete(recycle.toPath());
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }, TimeUnit.DAYS.toMillis(7), TimeUnit.DAYS.toMillis(7));
+        }).run();
+        new Timer("SubServers.Bungee::Recycle_Cleaner").scheduleAtFixedRate(cleaner, TimeUnit.DAYS.toMillis(7), TimeUnit.DAYS.toMillis(7));
 
         mProxy = new Proxy("(master)");
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "virtual");
