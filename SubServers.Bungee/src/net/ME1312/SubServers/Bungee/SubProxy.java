@@ -195,8 +195,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     if (recycle.isDirectory()) {
                         int kept = 0;
                         for (File file : recycle.listFiles()) {
-                            try {
-                                if (file.isDirectory()) {
+                            if (file.isDirectory()) {
+                                try {
                                     if (new File(recycle, file.getName() + "/info.json").exists()) {
                                         FileReader reader = new FileReader(new File(recycle, file.getName() + "/info.json"));
                                         YAMLSection info = new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class));
@@ -208,16 +208,14 @@ public final class SubProxy extends BungeeCommon implements Listener {
                                             }
                                         }
                                     }
-                                    Directories.delete(file);
-                                } else {
-                                    Files.delete(file.toPath());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                                Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
-                            } catch (Exception e) {
-                                Logger.get("SubServers").warning("Problem scanning ./SubServers/Recently Deleted/" + file.getName());
-                                e.printStackTrace();
+                                Directories.delete(file);
+                            } else {
                                 Files.delete(file.toPath());
                             }
+                            Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                         }
                         if (kept == 0) {
                             Files.delete(recycle.toPath());

@@ -136,8 +136,8 @@ public final class ExHost {
                         if (recycle.isDirectory()) {
                             int kept = 0;
                             for (File file : recycle.listFiles()) {
-                                try {
-                                    if (file.isDirectory()) {
+                                if (file.isDirectory()) {
+                                    try {
                                         if (new File(recycle, file.getName() + "/info.json").exists()) {
                                             FileReader reader = new FileReader(new File(recycle, file.getName() + "/info.json"));
                                             JSONObject info = new JSONObject(Util.readAll(reader));
@@ -149,16 +149,14 @@ public final class ExHost {
                                                 }
                                             }
                                         }
-                                        Directories.delete(file);
-                                    } else {
-                                        Files.delete(file.toPath());
+                                    } catch (Exception e) {
+                                        log.error.println(e);
                                     }
-                                    log.info.println("Removed ./SubServers/Recently Deleted/" + file.getName());
-                                } catch (Exception e) {
-                                    log.error.println("Problem scanning ./SubServers/Recently Deleted/" + file.getName());
-                                    log.error.println(e);
+                                    Directories.delete(file);
+                                } else {
                                     Files.delete(file.toPath());
                                 }
+                                log.info.println("Removed ./Recently Deleted/" + file.getName());
                             }
                             if (kept == 0) {
                                 Files.delete(recycle.toPath());
